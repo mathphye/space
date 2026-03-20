@@ -37,7 +37,7 @@ const slides = [
     {
         id: "intro",
         title: { en: "Wave Mechanics", es: "Mecánica de Ondas" },
-        text: { 
+        text: {
             en: "The fundamental study of oscillations that propagate through a medium. Everything in the universe can be interpreted as an interference of waves.",
             es: "El estudio fundamental de las oscilaciones que se propagan a través de un medio. Todo en el universo puede interpretarse como una interferencia de ondas."
         },
@@ -94,9 +94,9 @@ const slides = [
     {
         id: "fourier",
         title: { en: "Spectral Synthesis", es: "Síntesis Espectral" },
-        text: { 
-            en: "Decomposition into phasors. Every emergent pattern is a sum of circular data. (This is exactly the interference from the previous slide analyzed).", 
-            es: "Descomposición en fasores. Cada patrón emergente es una suma de datos circulares. (Es exactamente la interferencia anterior analizada)." 
+        text: {
+            en: "Decomposition into phasors. Every emergent pattern is a sum of circular data. (This is exactly the interference from the previous slide analyzed).",
+            es: "Descomposición en fasores. Cada patrón emergente es una suma de datos circulares. (Es exactamente la interferencia anterior analizada)."
         },
         mode: "fourier",
         params: { freq: 40, amp: 80, damping: 0 }
@@ -112,14 +112,14 @@ class App {
         this.currentSlide = 0;
         this.time = 0;
         this.lang = 'en';
-        
+
         // UI Elements
         this.slideTitle = document.getElementById('slide-title');
         this.slideText = document.getElementById('slide-text');
         this.slideNum = document.getElementById('slide-count');
         this.progressFill = document.getElementById('progress-fill');
         this.currentModuleName = document.getElementById('module-name');
-        
+
         // Dynamic UI for translations
         this.ui = {
             mainTitle: document.getElementById('app-main-title'),
@@ -141,7 +141,7 @@ class App {
         this.phaseVal = document.getElementById('phase-val');
 
         this.init();
-        
+
         // Stats smoothing
         this.fpsHistory = [];
         this.maxHistory = 80;
@@ -230,7 +230,7 @@ class App {
     updateSlide() {
         const slide = slides[this.currentSlide];
         const dict = i18n[this.lang];
-        
+
         // Trigger Page Turn Animation
         const container = document.getElementById('slide-container');
         container.classList.remove('page-turn');
@@ -241,7 +241,7 @@ class App {
         this.slideTitle.innerText = slide.title[this.lang];
         this.slideText.innerText = slide.text[this.lang];
         this.slideNum.innerText = `0${this.currentSlide + 1} / 0${slides.length}`;
-        
+
         // Update Static HUD
         this.ui.mainTitle.innerHTML = `${dict.module} <span class="ink-sub">${dict.lab}</span>`;
         this.ui.topicLabel.innerHTML = `${dict.current} <span id="module-name">${dict.module}</span>`;
@@ -295,15 +295,15 @@ class App {
     loop(timestamp) {
         const delta = timestamp - (this.lastTime || timestamp);
         this.lastTime = timestamp;
-        
+
         // Moving Average para FPS
         const currentFps = 1000 / delta;
         if (currentFps > 0 && currentFps < 1000) {
             this.fpsHistory.push(currentFps);
             if (this.fpsHistory.length > this.maxHistory) this.fpsHistory.shift();
         }
-        
-        const avgFps = this.fpsHistory.reduce((a,b) => a+b, 0) / this.fpsHistory.length;
+
+        const avgFps = this.fpsHistory.reduce((a, b) => a + b, 0) / this.fpsHistory.length;
         this.fpsVal.innerText = Math.round(avgFps);
 
         const freq = parseFloat(this.freqParam.value) / 100;
@@ -319,7 +319,7 @@ class App {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.renderGhostFormulas();
         this.ctx.globalAlpha = 1;
-        
+
         const slide = slides[this.currentSlide];
         const amp = parseFloat(this.ampParam.value);
         const freq = parseFloat(this.freqParam.value);
@@ -332,7 +332,7 @@ class App {
         if (slide.mode === "interference") this.renderInterference(amp, freq, damping);
         if (slide.mode === "fourier") this.renderFourier(amp, freq, damping);
         if (slide.mode === "grid") this.renderIntro(amp, freq);
-        
+
         this.renderRipples();
     }
 
@@ -353,7 +353,7 @@ class App {
         this.ctx.font = `italic 2.22rem 'Architects Daughter'`;
         this.ctx.fillStyle = this.getInk(this.formulasOpacity);
         this.ctx.textAlign = 'left';
-        
+
         this.ghostFormulas.forEach(f => {
             this.ctx.fillText(f.text, f.x, f.y);
         });
@@ -398,7 +398,7 @@ class App {
         this.ctx.moveTo(x1, y1);
         this.ctx.lineTo(x2, y2);
         this.ctx.stroke();
-        
+
         this.ctx.beginPath();
         this.ctx.moveTo(x2, y2);
         this.ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
@@ -412,7 +412,7 @@ class App {
         const centerY = this.canvas.height / 2 + 100;
         const f = freq / 40;
         const k = 0.01 * f;
-        
+
         // --- Draw the Ink Wave ---
         this.ctx.strokeStyle = this.getInk();
         for (let x = 0; x < this.canvas.width; x += 5) {
@@ -427,7 +427,7 @@ class App {
         // Surfer tracker
         let valleyX = ((1.5 * Math.PI + this.time) / k) % this.canvas.width;
         if (valleyX < 0) valleyX += this.canvas.width;
-        
+
         const ratio = valleyX / this.canvas.width;
         const dampFactor = Math.exp(-ratio * damping / 10);
         const valleyY = centerY + Math.sin(valleyX * k - this.time) * amp * dampFactor;
@@ -436,7 +436,7 @@ class App {
         this.ctx.textAlign = 'center';
         this.ctx.save();
         this.ctx.translate(valleyX, valleyY - 5);
-        const slope = Math.cos(valleyX * k - this.time); 
+        const slope = Math.cos(valleyX * k - this.time);
         this.ctx.rotate(slope * 0.2);
         this.ctx.fillText('🦆🏄‍♂️', 0, 0);
         this.ctx.restore();
@@ -449,7 +449,7 @@ class App {
         const originX = this.canvas.width * 0.3;
         const f = freq / 40;
         const k = 0.01 * f;
-        
+
         this.ctx.lineWidth = 1.5;
         this.ctx.strokeStyle = this.getInk(0.4);
         this.ctx.beginPath();
@@ -458,7 +458,7 @@ class App {
         this.ctx.lineTo(this.canvas.width - 100, centerY - 8);
         this.ctx.moveTo(this.canvas.width - 80, centerY);
         this.ctx.lineTo(this.canvas.width - 100, centerY + 8);
-        
+
         this.ctx.moveTo(originX, centerY + amp + 140);
         this.ctx.lineTo(originX, centerY - amp - 140);
         this.ctx.lineTo(originX - 8, centerY - amp - 120);
@@ -483,9 +483,9 @@ class App {
         const turns = 12;
         const spacing = (massY - springTop) / turns;
         this.ctx.moveTo(originX, springTop);
-        for(let i=0; i<=turns; i++) {
+        for (let i = 0; i <= turns; i++) {
             const ty = springTop + i * spacing;
-            const tx = originX + (i > 0 && i < turns ? (i%2 === 0 ? 15 : -15) : 0);
+            const tx = originX + (i > 0 && i < turns ? (i % 2 === 0 ? 15 : -15) : 0);
             this.ctx.lineTo(tx, ty);
         }
         this.ctx.stroke();
@@ -521,10 +521,10 @@ class App {
         this.ctx.font = '26px "Gloria Hallelujah"';
         this.ctx.fillStyle = this.getInk();
         this.ctx.fillText(dict.y_axis, originX + 20, centerY - amp - 120);
-        
+
         this.ctx.font = '22px "Architects Daughter"';
         this.ctx.fillText(dict.time_space, this.canvas.width - 320, centerY + 45);
-        
+
         this.ctx.font = 'italic 18px "Architects Daughter"';
         this.ctx.fillText('+A', originX - 35, centerY - amp + 10);
         this.ctx.fillText('-A', originX - 35, centerY + amp + 10);
@@ -542,10 +542,10 @@ class App {
         const centerY = this.canvas.height / 2 + 100;
         const f = freq / 40;
         const k = 0.01 * f;
-        
+
         this.ctx.lineWidth = 1.5;
         this.ctx.setLineDash([5, 5]);
-        
+
         // Muted Component Waves 
         const redComp = this.isBlueprint ? 'rgba(255, 100, 100, 0.15)' : 'rgba(210, 40, 40, 0.25)';
         const blueComp = this.isBlueprint ? 'rgba(100, 200, 255, 0.15)' : 'rgba(40, 40, 210, 0.25)';
@@ -553,7 +553,7 @@ class App {
         this.ctx.strokeStyle = redComp;
         this.ctx.beginPath();
         for (let x = 0; x < this.canvas.width; x += 10) {
-            const y1 = centerY + Math.sin(x * k - this.time) * (amp/2);
+            const y1 = centerY + Math.sin(x * k - this.time) * (amp / 2);
             if (x === 0) this.ctx.moveTo(x, y1);
             else this.ctx.lineTo(x, y1);
         }
@@ -562,7 +562,7 @@ class App {
         this.ctx.strokeStyle = blueComp;
         this.ctx.beginPath();
         for (let x = 0; x < this.canvas.width; x += 10) {
-            const y2 = centerY + Math.sin(x * k + this.time) * (amp/2);
+            const y2 = centerY + Math.sin(x * k + this.time) * (amp / 2);
             if (x === 0) this.ctx.moveTo(x, y2);
             else this.ctx.lineTo(x, y2);
         }
@@ -573,8 +573,8 @@ class App {
         this.ctx.strokeStyle = this.getInk();
         this.ctx.beginPath();
         for (let x = 0; x < this.canvas.width; x += 5) {
-            const y1 = Math.sin(x * k - this.time) * (amp/2);
-            const y2 = Math.sin(x * k + this.time) * (amp/2);
+            const y1 = Math.sin(x * k - this.time) * (amp / 2);
+            const y2 = Math.sin(x * k + this.time) * (amp / 2);
             const y = centerY + y1 + y2;
             if (x === 0) this.ctx.moveTo(x, y + this.jitter());
             else this.ctx.lineTo(x, y + this.jitter());
@@ -584,11 +584,11 @@ class App {
         const wavelength = 2 * Math.PI / k;
         let tx1 = ((1.5 * Math.PI + this.time) / k) % this.canvas.width;
         if (tx1 < 0) tx1 += this.canvas.width;
-        const ty1 = centerY + Math.sin(tx1 * k - this.time) * (amp/2);
+        const ty1 = centerY + Math.sin(tx1 * k - this.time) * (amp / 2);
 
         let tx2 = ((1.5 * Math.PI - this.time) / k) % this.canvas.width;
         if (tx2 < 0) tx2 += this.canvas.width;
-        const ty2 = centerY + Math.sin(tx2 * k + this.time) * (amp/2);
+        const ty2 = centerY + Math.sin(tx2 * k + this.time) * (amp / 2);
 
         this.ctx.font = '24px serif';
         this.ctx.textAlign = 'center';
@@ -598,10 +598,10 @@ class App {
 
         this.ctx.font = 'italic 16px "Architects Daughter"';
         this.ctx.fillStyle = redComp;
-        this.ctx.fillText(this.lang === 'en' ? 'Traveling wave →' : 'Onda viajera →', 50, centerY - (amp/2) - 40);
+        this.ctx.fillText(this.lang === 'en' ? 'Traveling wave →' : 'Onda viajera →', 50, centerY - (amp / 2) - 40);
         this.ctx.fillStyle = blueComp;
-        this.ctx.fillText(this.lang === 'en' ? '← Traveling wave' : '← Onda viajera', this.canvas.width - 200, centerY - (amp/2) - 40);
-        
+        this.ctx.fillText(this.lang === 'en' ? '← Traveling wave' : '← Onda viajera', this.canvas.width - 200, centerY - (amp / 2) - 40);
+
         const nodeSpacing = wavelength / 2;
         this.ctx.strokeStyle = this.getInk(0.15);
         this.ctx.setLineDash([4, 4]);
@@ -614,8 +614,8 @@ class App {
         this.ctx.setLineDash([]);
 
         for (let nx = nodeSpacing; nx < this.canvas.width; nx += nodeSpacing) {
-            const y1 = Math.sin(nx * k - this.time) * (amp/2);
-            const y2 = Math.sin(nx * k + this.time) * (amp/2);
+            const y1 = Math.sin(nx * k - this.time) * (amp / 2);
+            const y2 = Math.sin(nx * k + this.time) * (amp / 2);
             this.drawArrow(nx, centerY, nx, centerY + y1, redComp);
             this.drawArrow(nx, centerY, nx, centerY + y2, blueComp);
         }
@@ -626,8 +626,8 @@ class App {
         const centerY = this.canvas.height / 2 + 50;
         const centerX = this.canvas.width / 2;
         const f = (freq / 40) / 3; // Reduced frequency by 3x
-        const focus = freq / 40; 
-        
+        const focus = freq / 40;
+
         // --- 1. Draw 3D Axes System ---
         this.ctx.lineWidth = 1;
         this.ctx.strokeStyle = 'rgba(26, 26, 26, 0.15)';
@@ -680,10 +680,10 @@ class App {
             const gaussian = Math.exp(-dx * dx * focus);
             const re = Math.cos(x * 0.05 * f - this.time) * displayAmp * gaussian;
             const im = Math.sin(x * 0.05 * f - this.time) * displayAmp * gaussian;
-            
+
             const px = x + im * tiltX;
             const py = centerY + re + im * tiltY;
-            
+
             if (x === 0) this.ctx.moveTo(px, py);
             else this.ctx.lineTo(px, py);
         }
@@ -693,12 +693,12 @@ class App {
         this.ctx.strokeStyle = 'rgba(0,0,0,0.1)';
         this.ctx.setLineDash([5, 5]);
         this.ctx.beginPath();
-        for(let a=0; a<Math.PI*2; a+=0.15){
-            const rc = Math.cos(a)*displayAmp;
-            const ic = Math.sin(a)*displayAmp;
-            const px = centerX + ic*tiltX;
-            const py = centerY + rc + ic*tiltY;
-            if(a===0) this.ctx.moveTo(px, py);
+        for (let a = 0; a < Math.PI * 2; a += 0.15) {
+            const rc = Math.cos(a) * displayAmp;
+            const ic = Math.sin(a) * displayAmp;
+            const px = centerX + ic * tiltX;
+            const py = centerY + rc + ic * tiltY;
+            if (a === 0) this.ctx.moveTo(px, py);
             else this.ctx.lineTo(px, py);
         }
         this.ctx.closePath();
@@ -709,7 +709,7 @@ class App {
         const phase0 = centerX * 0.05 * f - this.time;
         const re0 = Math.cos(phase0) * displayAmp;
         const im0 = Math.sin(phase0) * displayAmp;
-        
+
         const phasorX = centerX + im0 * tiltX;
         const phasorY = centerY + re0 + im0 * tiltY;
         this.drawArrow(centerX, centerY, phasorX, phasorY, 'rgba(0,0,0,0.8)');
@@ -720,7 +720,7 @@ class App {
         this.ctx.fillText('Re [ψ]', centerX + 10, centerY - displayAmp - 60);
         this.ctx.fillStyle = 'rgba(40, 40, 210, 0.6)';
         this.ctx.fillText('Im [ψ]', centerX + 150, centerY + 80);
-        
+
         this.ctx.font = '18px "Architects Daughter"';
         this.ctx.fillStyle = this.getInk();
         this.ctx.fillText(this.lang === 'en' ? 'Phase (Rotating Helix)' : 'Fase (Hélice Rotativa)', centerX - 100, centerY + displayAmp + 80);
@@ -747,7 +747,7 @@ class App {
         const dict = i18n[this.lang];
         const centerY = this.canvas.height / 2;
         const f0 = freq / 40;
-        
+
         // --- 3 Component Waves ---
         const components = [
             { f: 1.0, k: 0.01, speed: 1, a: 1.0, color: this.isBlueprint ? 'rgba(255,100,100,0.5)' : 'rgba(210, 40, 40, 0.5)', lab: 'W1' },
@@ -767,7 +767,7 @@ class App {
         components.forEach((c, i) => {
             const bx = dashX + i * colWidth;
             const by = dashY;
-            
+
             const maxH = 100;
             const currentH = c.a * amp * 1.5;
             this.ctx.fillStyle = this.getInk(0.05);
@@ -778,7 +778,7 @@ class App {
             this.ctx.strokeRect(bx, by, 30, -maxH);
 
             const dialX = bx + 80;
-            const dialY = by - maxH/2;
+            const dialY = by - maxH / 2;
             const currentPhase = this.time * 2 * c.speed;
             const px = Math.sin(currentPhase) * 40;
             const py = Math.cos(currentPhase) * 40;
@@ -833,14 +833,14 @@ class App {
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
         const f = freq / 40;
-        
+
         // 1. Expanding Ink Ripples
         this.ctx.lineWidth = 1.5;
         for (let i = 0; i < 5; i++) {
             const timeOffset = (this.time * 2 + i * 2) % 10;
             const radius = timeOffset * (amp * 2);
             const alpha = 0.2 * (1 - timeOffset / 10);
-            
+
             this.ctx.strokeStyle = `rgba(0,0,0,${alpha})`;
             this.ctx.beginPath();
             // Scribbly circle
@@ -858,12 +858,12 @@ class App {
         // 2. Converging Particles
         for (let i = 0; i < 30; i++) {
             const angle = (i * 137.5) * (Math.PI / 180); // Fibonacci spiral start
-            const dist = ( (this.time * 50 + i * 20) % (amp * 4) );
+            const dist = ((this.time * 50 + i * 20) % (amp * 4));
             const x = centerX + Math.cos(angle + this.time * 0.2) * dist;
             const y = centerY + Math.sin(angle + this.time * 0.2) * dist;
-            
+
             const size = 2 + (i % 6);
-            this.ctx.fillStyle = `rgba(0,0,0,${0.05 + (dist / (amp*4)) * 0.1})`;
+            this.ctx.fillStyle = `rgba(0,0,0,${0.05 + (dist / (amp * 4)) * 0.1})`;
             this.ctx.beginPath();
             this.ctx.arc(x, y, size, 0, Math.PI * 2);
             this.ctx.fill();
