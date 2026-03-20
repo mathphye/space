@@ -144,7 +144,11 @@ class App {
         
         // Stats smoothing
         this.fpsHistory = [];
-        this.maxHistory = 80; // Smooth over 80 frames (~1.3s)
+        this.maxHistory = 80;
+
+        // Interactive Ripples
+        this.ripples = [];
+        this.isBlueprint = false;
     }
 
     init() {
@@ -154,7 +158,26 @@ class App {
         // Nav
         document.getElementById('btn-next').onclick = () => this.nextSlide();
         document.getElementById('btn-prev').onclick = () => this.prevSlide();
-        document.getElementById('btn-reset').onclick = () => this.updateSlide();
+        document.getElementById('btn-reset').onclick = () => this.resetParams();
+        document.getElementById('btn-random').onclick = () => this.randomizeParams();
+
+        // Theme Toggle
+        const themeBtn = document.getElementById('btn-theme');
+        if (themeBtn) {
+            themeBtn.onclick = () => {
+                this.isBlueprint = !this.isBlueprint;
+                document.body.classList.toggle('blueprint-mode');
+                themeBtn.textContent = this.isBlueprint ? 'Original' : 'Blueprint';
+            };
+        }
+
+        // Click to Ripple
+        this.canvas.addEventListener('mousedown', (e) => {
+            const rect = this.canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            this.ripples.push({ x, y, t: 0, life: 1.0 });
+        });
 
         // Lang
         document.getElementById('btn-en').onclick = () => this.setLanguage('en');
@@ -179,6 +202,20 @@ class App {
         this.lang = l;
         document.getElementById('btn-en').classList.toggle('active', l === 'en');
         document.getElementById('btn-es').classList.toggle('active', l === 'es');
+        this.updateSlide();
+    }
+
+    randomizeParams() {
+        this.freqParam.value = Math.floor(Math.random() * 200) + 20;
+        this.ampParam.value = Math.floor(Math.random() * 150) + 30;
+        this.dampingParam.value = Math.floor(Math.random() * 40);
+        this.updateSlide();
+    }
+
+    resetParams() {
+        this.freqParam.value = 50;
+        this.ampParam.value = 70;
+        this.dampingParam.value = 0;
         this.updateSlide();
     }
 
@@ -296,6 +333,37 @@ class App {
         if (slide.mode === "interference") this.renderInterference(amp, freq, damping);
         if (slide.mode === "fourier") this.renderFourier(amp, freq, damping);
         if (slide.mode === "grid") this.renderIntro(amp, freq);
+        
+        this.renderRipples();
+    }
+
+    getInk(alpha = 1) {
+        return this.isBlueprint ? `rgba(255,255,255,${alpha})` : `rgba(26,26,26,${alpha})`;
+    }
+
+    renderRipples() {
+        this.ripples.forEach((r, idx) => {
+            r.t += 0.02;
+            r.life -= 0.01;
+            if (r.life <= 0) {
+                this.ripples.splice(idx, 1);
+                return;
+            }
+
+            const radius = r.t * 200;
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = this.getInk(r.life * 0.3);
+            this.ctx.lineWidth = 2;
+            this.ctx.arc(r.x, r.y, radius, 0, Math.PI * 2);
+            this.ctx.stroke();
+
+            // Second ring
+            if (r.t > 0.2) {
+                this.ctx.beginPath();
+                this.ctx.arc(r.x, r.y, radius * 0.7, 0, Math.PI * 2);
+                this.ctx.stroke();
+            }
+        });
     }
 
     jitter() { return (Math.random() - 0.5) * 1.5; }
@@ -327,6 +395,7 @@ class App {
         const k = 0.01 * f;
         
         // --- Draw the Ink Wave ---
+        this.ctx.strokeStyle = this.getInk();
         for (let x = 0; x < this.canvas.width; x += 5) {
             const ratio = x / this.canvas.width;
             const dampFactor = Math.exp(-ratio * damping / 10);
@@ -336,9 +405,7 @@ class App {
         }
         this.ctx.stroke();
 
-        // --- Add a "Surfer" to one of the valleys ---
-        // Buscamos un valla fija siguiendo la fase (kx - wt = 3π/2)
-        // x = (1.5π + wt) / k
+        // Surfer tracker
         let valleyX = ((1.5 * Math.PI + this.time) / k) % this.canvas.width;
         if (valleyX < 0) valleyX += this.canvas.width;
         
@@ -346,12 +413,10 @@ class App {
         const dampFactor = Math.exp(-ratio * damping / 10);
         const valleyY = centerY + Math.sin(valleyX * k - this.time) * amp * dampFactor;
 
-        // Emoji de "Surfer" o un patito navegando
         this.ctx.font = '32px serif';
         this.ctx.textAlign = 'center';
         this.ctx.save();
         this.ctx.translate(valleyX, valleyY - 5);
-        // Pequeña oscilación de rotación según la pendiente
         const slope = Math.cos(valleyX * k - this.time); 
         this.ctx.rotate(slope * 0.2);
         this.ctx.fillText('🦆🏄‍♂️', 0, 0);
@@ -367,7 +432,7 @@ class App {
         const k = 0.01 * f;
         
         this.ctx.lineWidth = 1.5;
-        this.ctx.strokeStyle = 'rgba(26, 26, 26, 0.4)';
+        this.ctx.strokeStyle = this.getInk(0.4);
         this.ctx.beginPath();
         this.ctx.moveTo(originX - 80, centerY);
         this.ctx.lineTo(this.canvas.width - 80, centerY);
@@ -392,7 +457,7 @@ class App {
 
         const massY = centerY + Math.sin(-this.time) * amp;
 
-        this.ctx.strokeStyle = '#333';
+        this.ctx.strokeStyle = this.getInk(0.8);
         this.ctx.lineWidth = 2;
         this.ctx.beginPath();
         const springTop = centerY - amp - 100;
@@ -406,18 +471,18 @@ class App {
         }
         this.ctx.stroke();
 
-        this.ctx.fillStyle = '#1a1a1a';
+        this.ctx.fillStyle = this.getInk();
         this.ctx.beginPath();
         this.ctx.arc(originX, massY, 20, 0, Math.PI * 2);
         this.ctx.fill();
-        this.ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        this.ctx.fillStyle = 'rgba(255,255,255,0.2)';
         this.ctx.beginPath();
         this.ctx.arc(originX - 6, massY - 6, 6, 0, Math.PI * 2);
         this.ctx.fill();
 
         this.ctx.beginPath();
         this.ctx.lineWidth = 4;
-        this.ctx.strokeStyle = '#1a1a1a';
+        this.ctx.strokeStyle = this.getInk();
         for (let x = originX; x < this.canvas.width - 100; x += 5) {
             const localX = x - originX;
             const y = centerY + Math.sin(localX * k - this.time) * amp;
@@ -427,7 +492,7 @@ class App {
         this.ctx.stroke();
 
         this.ctx.setLineDash([5, 10]);
-        this.ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        this.ctx.strokeStyle = this.getInk(0.2);
         this.ctx.beginPath();
         this.ctx.moveTo(originX, massY);
         this.ctx.lineTo(originX + 200, massY);
@@ -435,7 +500,7 @@ class App {
         this.ctx.setLineDash([]);
 
         this.ctx.font = '26px "Gloria Hallelujah"';
-        this.ctx.fillStyle = '#1a1a1a';
+        this.ctx.fillStyle = this.getInk();
         this.ctx.fillText(dict.y_axis, originX + 20, centerY - amp - 120);
         
         this.ctx.font = '22px "Architects Daughter"';
@@ -459,12 +524,14 @@ class App {
         const f = freq / 40;
         const k = 0.01 * f;
         
-        // --- 1. Draw Components (The two traveling waves) ---
         this.ctx.lineWidth = 1.5;
         this.ctx.setLineDash([5, 5]);
         
-        // Right-moving wave (Light red ink wash)
-        this.ctx.strokeStyle = 'rgba(210, 40, 40, 0.25)';
+        // Muted Component Waves 
+        const redComp = this.isBlueprint ? 'rgba(255, 100, 100, 0.15)' : 'rgba(210, 40, 40, 0.25)';
+        const blueComp = this.isBlueprint ? 'rgba(100, 200, 255, 0.15)' : 'rgba(40, 40, 210, 0.25)';
+
+        this.ctx.strokeStyle = redComp;
         this.ctx.beginPath();
         for (let x = 0; x < this.canvas.width; x += 10) {
             const y1 = centerY + Math.sin(x * k - this.time) * (amp/2);
@@ -473,8 +540,7 @@ class App {
         }
         this.ctx.stroke();
 
-        // Left-moving wave (Light blue ink wash)
-        this.ctx.strokeStyle = 'rgba(40, 40, 210, 0.25)';
+        this.ctx.strokeStyle = blueComp;
         this.ctx.beginPath();
         for (let x = 0; x < this.canvas.width; x += 10) {
             const y2 = centerY + Math.sin(x * k + this.time) * (amp/2);
@@ -484,9 +550,8 @@ class App {
         this.ctx.stroke();
         this.ctx.setLineDash([]);
 
-        // --- 2. Draw Resultant Standing Wave (Sum) ---
         this.ctx.lineWidth = 3.5;
-        this.ctx.strokeStyle = '#1a1a1a';
+        this.ctx.strokeStyle = this.getInk();
         this.ctx.beginPath();
         for (let x = 0; x < this.canvas.width; x += 5) {
             const y1 = Math.sin(x * k - this.time) * (amp/2);
@@ -497,34 +562,29 @@ class App {
         }
         this.ctx.stroke();
 
-        // --- 3. Annotations & Motion Trackers ---
         const wavelength = 2 * Math.PI / k;
-        
-        // Tracker for Wave 1 (Right →)
         let tx1 = ((1.5 * Math.PI + this.time) / k) % this.canvas.width;
         if (tx1 < 0) tx1 += this.canvas.width;
         const ty1 = centerY + Math.sin(tx1 * k - this.time) * (amp/2);
 
-        // Tracker for Wave 2 (Left ←)
         let tx2 = ((1.5 * Math.PI - this.time) / k) % this.canvas.width;
         if (tx2 < 0) tx2 += this.canvas.width;
         const ty2 = centerY + Math.sin(tx2 * k + this.time) * (amp/2);
 
         this.ctx.font = '24px serif';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('🔴', tx1, ty1 + 5); // Right-moving tracker
-        this.ctx.fillText('🔵', tx2, ty2 + 5); // Left-moving tracker
+        this.ctx.fillText('🔴', tx1, ty1 + 5);
+        this.ctx.fillText('🔵', tx2, ty2 + 5);
         this.ctx.textAlign = 'left';
 
         this.ctx.font = 'italic 16px "Architects Daughter"';
-        this.ctx.fillStyle = 'rgba(255,0,0,0.5)'; // Subtle red for R
+        this.ctx.fillStyle = redComp;
         this.ctx.fillText(this.lang === 'en' ? 'Traveling wave →' : 'Onda viajera →', 50, centerY - (amp/2) - 40);
-        this.ctx.fillStyle = 'rgba(0,0,255,0.5)'; // Subtle blue for L
+        this.ctx.fillStyle = blueComp;
         this.ctx.fillText(this.lang === 'en' ? '← Traveling wave' : '← Onda viajera', this.canvas.width - 200, centerY - (amp/2) - 40);
         
-        // Nodes indicator (sketchy vertical lines & VECTORS)
         const nodeSpacing = wavelength / 2;
-        this.ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+        this.ctx.strokeStyle = this.getInk(0.15);
         this.ctx.setLineDash([4, 4]);
         this.ctx.beginPath();
         for (let nx = 0; nx < this.canvas.width; nx += nodeSpacing) {
@@ -534,29 +594,12 @@ class App {
         this.ctx.stroke();
         this.ctx.setLineDash([]);
 
-        // NODE VECTORS (Showing interference cancellation)
-        this.ctx.font = 'bold 12px "JetBrains Mono"';
         for (let nx = nodeSpacing; nx < this.canvas.width; nx += nodeSpacing) {
             const y1 = Math.sin(nx * k - this.time) * (amp/2);
             const y2 = Math.sin(nx * k + this.time) * (amp/2);
-            
-            // Draw Component Vectors
-            this.drawArrow(nx, centerY, nx, centerY + y1, 'rgba(255, 30, 30, 0.8)'); // Red (Right)
-            this.drawArrow(nx, centerY, nx, centerY + y2, 'rgba(30, 30, 255, 0.8)'); // Blue (Left)
-            
-            // Equation "= 0"
-            if (Math.abs(y1) > 5) { // Only show label if vectors are visible
-                this.ctx.fillStyle = '#1a1a1a';
-                this.ctx.fillText('Σ=0', nx + 5, centerY + 15);
-            }
+            this.drawArrow(nx, centerY, nx, centerY + y1, redComp);
+            this.drawArrow(nx, centerY, nx, centerY + y2, blueComp);
         }
-        
-        const originX = this.canvas.width * 0.5; // Center for the label
-        this.ctx.font = '14px "Architects Daughter"';
-        this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText(this.lang === 'en' ? 'NODES' : 'NODOS', originX, centerY + amp + 40);
-        this.ctx.textAlign = 'left'; // Reset
     }
 
     renderSchrodinger(amp, freq, damping) {
@@ -660,7 +703,7 @@ class App {
         this.ctx.fillText('Im [ψ]', centerX + 150, centerY + 80);
         
         this.ctx.font = '18px "Architects Daughter"';
-        this.ctx.fillStyle = '#1a1a1a';
+        this.ctx.fillStyle = this.getInk();
         this.ctx.fillText(this.lang === 'en' ? 'Phase (Rotating Helix)' : 'Fase (Hélice Rotativa)', centerX - 100, centerY + displayAmp + 80);
     }
 
@@ -668,7 +711,7 @@ class App {
         const centerY = this.canvas.height / 2 + 100;
         const f = freq / 40;
         this.ctx.beginPath();
-        this.ctx.strokeStyle = '#1a1a1a';
+        this.ctx.strokeStyle = this.getInk();
         this.ctx.lineWidth = 3.5;
         for (let x = 0; x < this.canvas.width; x += 4) {
             const y1 = Math.sin(x * 0.01 * f + this.time) * amp;
@@ -688,9 +731,9 @@ class App {
         
         // --- 3 Component Waves ---
         const components = [
-            { f: 1.0, k: 0.01, speed: 1, a: 1.0, color: 'rgba(210, 40, 40, 0.5)', lab: 'W1' },
-            { f: 2.0, k: 0.02, speed: -0.7, a: 0.5, color: 'rgba(40, 40, 210, 0.5)', lab: 'W2' },
-            { f: 3.0, k: 0.03, speed: 0.4, a: 0.25, color: 'rgba(40, 210, 40, 0.5)', lab: 'W3' }
+            { f: 1.0, k: 0.01, speed: 1, a: 1.0, color: this.isBlueprint ? 'rgba(255,100,100,0.5)' : 'rgba(210, 40, 40, 0.5)', lab: 'W1' },
+            { f: 2.0, k: 0.02, speed: -0.7, a: 0.5, color: this.isBlueprint ? 'rgba(100,150,255,0.5)' : 'rgba(40, 40, 210, 0.5)', lab: 'W2' },
+            { f: 3.0, k: 0.03, speed: 0.4, a: 0.25, color: this.isBlueprint ? 'rgba(100,255,100,0.5)' : 'rgba(40, 210, 40, 0.5)', lab: 'W3' }
         ];
 
         // --- DASHBOARD (Inset to avoid controls) ---
@@ -699,7 +742,7 @@ class App {
         const colWidth = 160;
 
         this.ctx.font = 'bold 16px "Architects Daughter"';
-        this.ctx.fillStyle = '#111';
+        this.ctx.fillStyle = this.getInk();
         this.ctx.fillText(this.lang === 'en' ? 'PHASOR SPECTRAL DATA' : 'DATOS ESPECTRALES (FASORES)', dashX, dashY - 140);
 
         components.forEach((c, i) => {
@@ -708,11 +751,11 @@ class App {
             
             const maxH = 100;
             const currentH = c.a * amp * 1.5;
-            this.ctx.fillStyle = 'rgba(0,0,0,0.03)';
+            this.ctx.fillStyle = this.getInk(0.05);
             this.ctx.fillRect(bx, by, 30, -maxH);
             this.ctx.fillStyle = c.color;
             this.ctx.fillRect(bx, by, 30, -currentH);
-            this.ctx.strokeStyle = '#111';
+            this.ctx.strokeStyle = this.getInk(0.3);
             this.ctx.strokeRect(bx, by, 30, -maxH);
 
             const dialX = bx + 80;
@@ -721,14 +764,14 @@ class App {
             const px = Math.sin(currentPhase) * 40;
             const py = Math.cos(currentPhase) * 40;
 
-            this.ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+            this.ctx.strokeStyle = this.getInk(0.1);
             this.ctx.beginPath();
             this.ctx.arc(dialX, dialY, 40, 0, Math.PI * 2);
             this.ctx.stroke();
             this.drawArrow(dialX, dialY, dialX + px, dialY + py, c.color);
 
             this.ctx.font = 'bold 13px monospace';
-            this.ctx.fillStyle = '#111';
+            this.ctx.fillStyle = this.getInk();
             this.ctx.fillText(`${c.lab}`, bx + 40, by - maxH - 20);
             this.ctx.font = '11px monospace';
             this.ctx.fillText(`A: ${(c.a * amp).toFixed(0)}`, bx + 40, by - maxH + 10);
@@ -752,7 +795,7 @@ class App {
         this.ctx.setLineDash([]);
 
         this.ctx.lineWidth = 4;
-        this.ctx.strokeStyle = '#1a1a1a';
+        this.ctx.strokeStyle = this.getInk();
         this.ctx.beginPath();
         for (let x = 0; x < this.canvas.width; x += 5) {
             let sumY = 0;
@@ -765,7 +808,6 @@ class App {
             else this.ctx.lineTo(x, y + this.jitter());
         }
         this.ctx.stroke();
-
     }
 
     renderIntro(amp, freq) {

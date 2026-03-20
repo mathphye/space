@@ -33,7 +33,9 @@
     <!-- UI Overlay (HUD) -->
     <div id="hud-layer">
         <header class="hud-header">
-            <div class="brand">Mathphye</div>
+            <div class="brand-group">
+                <div class="brand">Mathphye</div>
+            </div>
 
 
             <div class="main-title-container">
@@ -60,21 +62,25 @@
         </div>
 
         <!-- Live Controls -->
-        <div id="controls-panel" class="glass-ui">
-            <div class="control-group">
-                <label>Frequency (f)</label>
-                <input type="range" id="param-freq" min="1" max="100" value="50">
+        <div id="controls-panel">
+            <div id="hidden-params" style="display: none;">
+                <div class="control-group">
+                    <label>Frequency (f)</label>
+                    <input type="range" id="param-freq" min="1" max="100" value="50">
+                </div>
+                <div class="control-group">
+                    <label>Amplitude (A)</label>
+                    <input type="range" id="param-amp" min="1" max="100" value="70">
+                </div>
+                <div class="control-group">
+                    <label>Damping (γ)</label>
+                    <input type="range" id="param-damping" min="0" max="100" value="0">
+                </div>
             </div>
-            <div class="control-group">
-                <label>Amplitude (A)</label>
-                <input type="range" id="param-amp" min="1" max="100" value="70">
-            </div>
-            <div class="control-group">
-                <label>Damping (γ)</label>
-                <input type="range" id="param-damping" min="0" max="100" value="0">
-            </div>
-            <div class="panel-footer">
-                <button id="btn-reset" class="action-btn">RESET SIM</button>
+
+            <div class="panel-footer experiment-hub">
+                <button id="btn-random" class="action-btn main-action pulse">EXPLORE RANDOM / GENERAR</button>
+                <button id="btn-reset" class="action-btn">Reset</button>
             </div>
         </div>
 
