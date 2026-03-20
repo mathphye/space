@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,15 +8,18 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Gloria+Hallelujah&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Gloria+Hallelujah&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body class="fullscreen-app notebook-theme">
     <!-- SVG Notebook Background -->
     <div class="notebook-background">
         <svg width="100%" height="100%">
             <defs>
                 <pattern id="dot-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e0e0e0" stroke-width="1" />
                 </pattern>
             </defs>
             <rect width="100%" height="100%" fill="#fafafa" />
@@ -25,14 +29,15 @@
     </div>
     <!-- Fullscreen Interactive Layer -->
     <canvas id="main-canvas"></canvas>
-    
+
     <!-- UI Overlay (HUD) -->
     <div id="hud-layer">
         <header class="hud-header">
-            <div class="brand">HUB.STORY <span class="v">v2.1</span></div>
-            
+            <div class="brand">Mathphye</div>
+
+
             <div class="main-title-container">
-                <h1 id="app-main-title">WAVE MECHANICS <span class="ink-sub">LABORATORY_</span></h1>
+                <h1 id="app-main-title">WAVE MECHANICS <span class="ink-sub">LABORATORY</span></h1>
             </div>
 
             <div class="topic-indicator">Current Module: <span id="module-name">Wave Mechanics</span></div>
@@ -41,13 +46,14 @@
         <!-- Slide Content -->
         <div id="slide-container" class="glass-ui">
             <h2 id="slide-title">Traveling Waves</h2>
-            <p id="slide-text">An oscillation that travels through a medium, transporting energy without transporting matter.</p>
-            
+            <p id="slide-text">An oscillation that travels through a medium, transporting energy without transporting
+                matter.</p>
+
             <div class="slide-navigation">
                 <button id="btn-prev" class="nav-btn">← Prev</button>
                 <div class="progress-container">
                     <div id="progress-fill"></div>
-                    <span id="slide-count" class="count-overlay">01 / 05</span>
+                    <span id="slide-count" class="count-overlay">01 / 06</span>
                 </div>
                 <button id="btn-next" class="nav-btn">Next →</button>
             </div>
@@ -73,9 +79,15 @@
         </div>
 
         <aside class="side-info">
-            <div class="stat-box">
-                <span class="val" id="fps-val">60</span>
-                <span class="lab">FPS</span>
+            <div class="stats-row">
+                <div class="lang-toggle">
+                    <button id="btn-en" class="active">EN</button> /
+                    <button id="btn-es">ES</button>
+                </div>
+                <div class="stat-box">
+                    <span class="val" id="fps-val">60</span>
+                    <span class="lab">FPS</span>
+                </div>
             </div>
             <div class="stat-box">
                 <span class="val" id="phase-val">0.00π</span>
@@ -107,19 +119,25 @@
             </div>
             <div class="ink-splat splat-1 bubble-style">
                 <svg viewBox="0 0 100 100">
-                    <path d="M50,10 C60,15 75,10 85,25 C95,45 80,65 65,85 C45,95 25,85 10,65 C5,45 20,15 50,10 Z" fill="rgba(0,0,0,0.1)" />
+                    <path d="M50,10 C60,15 75,10 85,25 C95,45 80,65 65,85 C45,95 25,85 10,65 C5,45 20,15 50,10 Z"
+                        fill="rgba(0,0,0,0.1)" />
                     <circle cx="40" cy="30" r="5" fill="rgba(255,255,255,0.08)" />
                 </svg>
             </div>
             <div class="ink-splat splat-3">
                 <svg viewBox="0 0 200 200">
-                    <path d="M100,100 L120,40 L110,100 L160,80 L110,110 L140,160 L100,120 L60,160 L90,110 L40,80 L90,100 Z" fill="rgba(0,0,0,0.08)" />
+                    <path
+                        d="M100,100 L120,40 L110,100 L160,80 L110,110 L140,160 L100,120 L60,160 L90,110 L40,80 L90,100 Z"
+                        fill="rgba(0,0,0,0.08)" />
                     <circle cx="130" cy="130" r="3" fill="rgba(0,0,0,0.1)" />
                     <circle cx="70" cy="70" r="4" fill="rgba(0,0,0,0.1)" />
                 </svg>
             </div>
             <div class="ink-splat splat-2">
-                <svg viewBox="0 0 100 100"><path d="M30,20 C50,10 80,20 90,40 C100,60 70,90 40,85 C20,80 10,50 30,20 Z" fill="rgba(26,26,26,0.02)" /></svg>
+                <svg viewBox="0 0 100 100">
+                    <path d="M30,20 C50,10 80,20 90,40 C100,60 70,90 40,85 C20,80 10,50 30,20 Z"
+                        fill="rgba(26,26,26,0.02)" />
+                </svg>
             </div>
             <div class="utensil pen">🖋️</div>
             <div class="utensil clip">📎</div>
@@ -130,4 +148,5 @@
 
     <script src="main.js"></script>
 </body>
+
 </html>
