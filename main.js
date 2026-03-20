@@ -148,7 +148,6 @@ class App {
 
         // Interactive Ripples
         this.ripples = [];
-        this.isBlueprint = false;
     }
 
     init() {
@@ -160,16 +159,6 @@ class App {
         document.getElementById('btn-prev').onclick = () => this.prevSlide();
         document.getElementById('btn-reset').onclick = () => this.resetParams();
         document.getElementById('btn-random').onclick = () => this.randomizeParams();
-
-        // Theme Toggle
-        const themeBtn = document.getElementById('btn-theme');
-        if (themeBtn) {
-            themeBtn.onclick = () => {
-                this.isBlueprint = !this.isBlueprint;
-                document.body.classList.toggle('blueprint-mode');
-                themeBtn.textContent = this.isBlueprint ? 'Original' : 'Blueprint';
-            };
-        }
 
         // Click to Ripple
         this.canvas.addEventListener('mousedown', (e) => {
@@ -275,6 +264,15 @@ class App {
 
     setupIdleTimer() {
         let timer;
+        this.formulasOpacity = 0;
+        this.ghostFormulas = [
+            { text: "∂²u/∂t² = v² ∇²u", x: 150, y: 350 },
+            { text: "iħ ∂/∂t Ψ = Ĥ Ψ", x: 800, y: 200 },
+            { text: "E = hf", x: 1200, y: 750 },
+            { text: "eⁱᶿ = cos θ + i sin θ", x: 450, y: 850 },
+            { text: "λ = h / p", x: 1500, y: 300 }
+        ];
+
         const resetTimer = () => {
             document.body.classList.remove('user-idle');
             clearTimeout(timer);
@@ -319,6 +317,7 @@ class App {
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.renderGhostFormulas();
         this.ctx.globalAlpha = 1;
         
         const slide = slides[this.currentSlide];
@@ -338,7 +337,27 @@ class App {
     }
 
     getInk(alpha = 1) {
-        return this.isBlueprint ? `rgba(255,255,255,${alpha})` : `rgba(26,26,26,${alpha})`;
+        return `rgba(26,26,26,${alpha})`;
+    }
+
+    renderGhostFormulas() {
+        if (document.body.classList.contains('user-idle')) {
+            this.formulasOpacity = Math.min(this.formulasOpacity + 0.005, 0.12); // Very subtle
+        } else {
+            this.formulasOpacity = Math.max(this.formulasOpacity - 0.05, 0);
+        }
+
+        if (this.formulasOpacity <= 0) return;
+
+        this.ctx.save();
+        this.ctx.font = `italic 2.22rem 'Architects Daughter'`;
+        this.ctx.fillStyle = this.getInk(this.formulasOpacity);
+        this.ctx.textAlign = 'left';
+        
+        this.ghostFormulas.forEach(f => {
+            this.ctx.fillText(f.text, f.x, f.y);
+        });
+        this.ctx.restore();
     }
 
     renderRipples() {
