@@ -76,27 +76,33 @@ const slides = [
     },
     {
         id: "schrodinger",
+        premium: true,
         title: { en: "The Wave Function", es: "La Función de Onda" },
         text: {
-            en: "In the quantum realm, matter is a localized wave of probability. Look at the complex components—real and imaginary—that form a quantum state.",
-            es: "En el reino cuántico, la materia es una onda de probabilidad localizada. Mira los componentes complejos —reales e imaginarios— que forman un estado cuántico."
+            en: "In the quantum realm, matter is a localized wave of probability. (Premium Access required to view the full Schrödinger evolution).",
+            es: "En el reino cuántico, la materia es una onda de probabilidad. (Acceso Premium para ver la evolución completa)."
         },
         mode: "schrodinger",
         params: { freq: 80, amp: 85, damping: 10 }
     },
     {
         id: "interference",
+        premium: true,
         title: { en: "Wave Interference", es: "Interferencia de Ondas" },
-        text: { en: "When two waves meet, their amplitudes add up. This creates regions of constructive and destructive interference, the basis of wave optics.", es: "Cuando dos ondas se encuentran, sus amplitudes se suman. Esto genera zonas de interferencia constructiva y destructiva, la base de la óptica ondulatoria." },
+        text: { 
+            en: "When two waves meet, their amplitudes add up. (Premium Access unlocks the custom interference lab).", 
+            es: "Cuando dos ondas se encuentran, sus amplitudes se suman. (Acceso Premium desbloquea el laboratorio)." 
+        },
         mode: "interference",
         params: { freq: 40, amp: 80, damping: 0 }
     },
     {
         id: "fourier",
+        premium: true,
         title: { en: "Spectral Synthesis", es: "Síntesis Espectral" },
         text: {
-            en: "Decomposition into phasors. Every emergent pattern is a sum of circular data. (This is exactly the interference from the previous slide analyzed).",
-            es: "Descomposición en fasores. Cada patrón emergente es una suma de datos circulares. (Es exactamente la interferencia anterior analizada)."
+            en: "Decomposition into phasors. (Premium Access required for full Fourier analysis).",
+            es: "Descomposición en fasores. (Acceso Premium para análisis de Fourier)."
         },
         mode: "fourier",
         params: { freq: 40, amp: 80, damping: 0 }
@@ -148,6 +154,7 @@ class App {
 
         // Interactive Ripples
         this.ripples = [];
+        this.hasPaid = false; // Paywall State
     }
 
     init() {
@@ -184,6 +191,22 @@ class App {
 
         this.updateSlide();
         this.setupIdleTimer();
+        
+        // Paywall Action
+        const buyBtn = document.getElementById('btn-buy');
+        if (buyBtn) {
+            buyBtn.onclick = () => {
+                // Here you would redirect to Lemon Squeezy / Stripe
+                // For now, let's simulate a successful payment:
+                alert(this.lang === 'en' ? "Redirecting to Payment Gateway..." : "Redirigiendo a Pasarela de Pago...");
+                setTimeout(() => {
+                    this.hasPaid = true;
+                    this.updateSlide();
+                    alert(this.lang === 'en' ? "Access Unlocked! Welcome to the Full Lab." : "¡Acceso Desbloqueado! Bienvenido al Lab Completo.");
+                }, 2000);
+            };
+        }
+
         requestAnimationFrame((t) => this.loop(t));
     }
 
@@ -241,10 +264,23 @@ class App {
             container.classList.add('page-turn');
         }
 
-        // Update Text
-        this.slideTitle.innerText = slide.title[this.lang];
-        this.slideText.innerText = slide.text[this.lang];
-        this.slideNum.innerText = `0${this.currentSlide + 1} / 0${slides.length}`;
+        // Premium Paywall Logic
+        const paywall = document.getElementById('paywall-overlay');
+        const isLocked = slide.premium && !this.hasPaid;
+
+        if (isLocked) {
+            paywall.style.display = 'flex';
+            this.slideTitle.style.opacity = '0';
+            this.slideText.style.opacity = '0';
+        } else {
+            paywall.style.display = 'none';
+            this.slideTitle.style.opacity = '1';
+            this.slideText.style.opacity = '1';
+            
+            // Trigger Text Update (Simple for now since typewriter was removed by USER)
+            this.slideTitle.innerText = slide.title[this.lang];
+            this.slideText.innerText = slide.text[this.lang];
+        }
 
         // Update Static HUD
         this.ui.mainTitle.innerHTML = `${dict.module} <span class="ink-sub">${dict.lab}</span>`;

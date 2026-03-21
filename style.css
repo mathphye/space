@@ -269,6 +269,61 @@ body.notebook-theme {
     transition: var(--transition);
 }
 
+/* Premium Paywall Style */
+#paywall-overlay {
+    position: absolute;
+    bottom: 80px;
+    left: 80px;
+    width: 650px;
+    padding: 100px 80px;
+    background: #1a1a1a;
+    color: #ffffff;
+    border-radius: 4px;
+    z-index: 2000;
+    text-align: center;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+    display: none; /* Controlled by JS */
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+#paywall-overlay .lock-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+}
+
+#paywall-title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    line-height: 1.2;
+    color: #fff;
+    margin: 0;
+}
+
+#paywall-text {
+    font-family: var(--font-body);
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+    max-width: 80%;
+}
+
+#btn-buy {
+    background: #fff;
+    color: #000;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 50px;
+}
+
+.paywall-footer {
+    font-size: 0.8rem;
+    opacity: 0.4;
+    letter-spacing: 2px;
+}
+
 #slide-number {
     font-family: var(--font-heading);
     color: var(--accent);
