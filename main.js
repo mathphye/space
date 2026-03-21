@@ -195,17 +195,19 @@ class App {
     }
 
     randomizeParams() {
-        this.freqParam.value = Math.floor(Math.random() * 200) + 20;
-        this.ampParam.value = Math.floor(Math.random() * 150) + 30;
-        this.dampingParam.value = Math.floor(Math.random() * 40);
-        this.updateSlide();
+        // Range 1-100 to match slider constraints
+        this.freqParam.value = Math.floor(Math.random() * 99) + 1;
+        this.ampParam.value = Math.floor(Math.random() * 99) + 1;
+        this.dampingParam.value = Math.floor(Math.random() * 50);
+        this.updateSlide(false); // Update visuals but keep THESE params
     }
 
     resetParams() {
-        this.freqParam.value = 50;
-        this.ampParam.value = 70;
-        this.dampingParam.value = 0;
-        this.updateSlide();
+        const slide = slides[this.currentSlide];
+        this.freqParam.value = slide.params.freq;
+        this.ampParam.value = slide.params.amp;
+        this.dampingParam.value = slide.params.damping;
+        this.updateSlide(false); // Update visuals with these reset params
     }
 
     resize() {
@@ -227,15 +229,17 @@ class App {
         }
     }
 
-    updateSlide() {
+    updateSlide(loadParams = true) {
         const slide = slides[this.currentSlide];
         const dict = i18n[this.lang];
 
         // Trigger Page Turn Animation
         const container = document.getElementById('slide-container');
-        container.classList.remove('page-turn');
-        void container.offsetWidth; // Force reflow
-        container.classList.add('page-turn');
+        if (container) {
+            container.classList.remove('page-turn');
+            void container.offsetWidth; // Force reflow
+            container.classList.add('page-turn');
+        }
 
         // Update Text
         this.slideTitle.innerText = slide.title[this.lang];
@@ -244,22 +248,30 @@ class App {
 
         // Update Static HUD
         this.ui.mainTitle.innerHTML = `${dict.module} <span class="ink-sub">${dict.lab}</span>`;
-        this.ui.topicLabel.innerHTML = `${dict.current} <span id="module-name">${dict.module}</span>`;
-        this.ui.labelFreq.innerText = dict.freq;
-        this.ui.labelAmp.innerText = dict.amp;
-        this.ui.labelDamping.innerText = dict.damping;
-        this.ui.btnReset.innerText = dict.reset;
-        this.ui.btnPrev.innerText = dict.prev;
-        this.ui.btnNext.innerText = dict.next;
-        this.ui.labPhase.innerText = dict.phase;
+        if (this.ui.topicLabel) this.ui.topicLabel.innerHTML = `${dict.current} <span id="module-name">${dict.module}</span>`;
+        if (this.ui.labelFreq) this.ui.labelFreq.innerText = dict.freq;
+        if (this.ui.labelAmp) this.ui.labelAmp.innerText = dict.amp;
+        if (this.ui.labelDamping) this.ui.labelDamping.innerText = dict.damping;
+        if (this.ui.btnReset) this.ui.btnReset.innerText = dict.reset;
+        if (this.ui.btnPrev) this.ui.btnPrev.innerText = dict.prev;
+        if (this.ui.btnNext) this.ui.btnNext.innerText = dict.next;
+        if (this.ui.labPhase) this.ui.labPhase.innerText = dict.phase;
 
         // Update Progress
         this.progressFill.style.width = `${((this.currentSlide + 1) / slides.length) * 100}%`;
 
-        // Update Params
-        this.freqParam.value = slide.params.freq;
-        this.ampParam.value = slide.params.amp;
-        this.dampingParam.value = slide.params.damping;
+        // Update Params ONLY if we are switching slides or hard-resetting
+        if (loadParams) {
+            this.freqParam.value = slide.params.freq;
+            this.ampParam.value = slide.params.amp;
+            this.dampingParam.value = slide.params.damping;
+        }
+
+        // Sync Slider visual fillers (the ink color)
+        [this.freqParam, this.ampParam, this.dampingParam].forEach(slider => {
+            const ratio = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+            slider.style.setProperty('--v', `${ratio}%`);
+        });
     }
 
     setupIdleTimer() {
