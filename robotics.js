@@ -41,29 +41,12 @@ function sliderToLinkLength(v) {
     return (parseFloat(v) / 100) * 300 + 50;
 }
 
-/** Display angle as a rational multiple of π when close (e.g. π/4, 5π/6). */
+/** Radians as α·π with α to 2 decimals and symbolic π (U+03C0). */
 function formatAngleAsPiMultiple(rad) {
-    const EPS = 0.052;
-    const x = rad / Math.PI;
-    const sign = x < 0 ? "-" : "";
-    const ax = Math.abs(x);
-
-    for (let d = 1; d <= 12; d++) {
-        const nMax = Math.min(48, Math.ceil((ax + EPS) * d) + 2);
-        for (let n = 0; n <= nMax; n++) {
-            const v = n / d;
-            if (Math.abs(ax - v) < EPS) {
-                if (n === 0) return "0";
-                if (d === 1) return sign + (n === 1 ? "π" : `${n}π`);
-                if (n === 1) return sign + `π/${d}`;
-                return sign + `${n}π/${d}`;
-            }
-        }
-    }
-
-    const c = ax.toFixed(3).replace(/\.?0+$/, "");
-    if (c === "0") return "0";
-    return sign + (c === "1" ? "π" : `${c}π`);
+    const alfa = rad / Math.PI;
+    const s = alfa.toFixed(2);
+    if (s === "0.00" || s === "-0.00") return "0·π";
+    return `${s}·π`;
 }
 
 const slides = [
