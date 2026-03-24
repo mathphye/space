@@ -41,6 +41,11 @@ function sliderToLinkLength(v) {
     return (parseFloat(v) / 100) * 300 + 50;
 }
 
+/** Inverse of sliderToLinkLength; slider value clamped 10–100 → length 80–350 px. */
+function lengthToSlider(len) {
+    return Math.round(((parseFloat(len) - 50) / 300) * 100);
+}
+
 /** Radians as α·π with α to 2 decimals and symbolic π (U+03C0). */
 function formatAngleAsPiMultiple(rad) {
     const alfa = rad / Math.PI;
@@ -78,7 +83,7 @@ const slides = [
             es: "El problema inverso: dado un punto objetivo, ¿qué ángulos se necesitan? Mueve el ratón para ver al brazo calcular sus metas."
         },
         mode: "ik",
-        params: { theta1: 0, theta2: 0, length: 180 }
+        params: { theta1: 0, theta2: 0, length: 50, l1: 44, l2: 35 }
     },
     {
         id: "joints_multi",
@@ -142,6 +147,8 @@ class App {
         this.param3 = document.getElementById('param-damping');
         this.paramL1 = document.getElementById('param-l1');
         this.paramL2 = document.getElementById('param-l2');
+        this.paramL1Num = document.getElementById('param-l1-num');
+        this.paramL2Num = document.getElementById('param-l2-num');
         this.fkPhasorDrag = null;
         this.groupLinkSingle = document.getElementById('group-link-single');
         this.fpsVal = document.getElementById('fps-val');
@@ -221,9 +228,21 @@ class App {
                 const ratio = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
                 slider.style.setProperty('--v', `${ratio}%`);
             };
-            slider.oninput = () => { updateVal(); this.updateSlide(false); };
+            slider.oninput = () => {
+                updateVal();
+                this.updateSlide(false);
+            };
             updateVal();
         });
+
+        if (this.paramL1Num) {
+            this.paramL1Num.addEventListener('input', () => this.applyLinkLengthFromNum(1));
+            this.paramL1Num.addEventListener('change', () => this.applyLinkLengthFromNum(1));
+        }
+        if (this.paramL2Num) {
+            this.paramL2Num.addEventListener('input', () => this.applyLinkLengthFromNum(2));
+            this.paramL2Num.addEventListener('change', () => this.applyLinkLengthFromNum(2));
+        }
 
         this.updateSlide();
         this.setupIdleTimer();
@@ -287,7 +306,8 @@ class App {
         this.param1.value = Math.floor(Math.random() * 100);
         this.param2.value = Math.floor(Math.random() * 100);
         this.param3.value = Math.floor(Math.random() * 90) + 10;
-        if (slides[this.currentSlide].mode === 'fk' && this.paramL1 && this.paramL2) {
+        const m = slides[this.currentSlide].mode;
+        if ((m === 'fk' || m === 'ik') && this.paramL1 && this.paramL2) {
             this.paramL1.value = Math.floor(Math.random() * 90) + 10;
             this.paramL2.value = Math.floor(Math.random() * 90) + 10;
         }
@@ -299,10 +319,31 @@ class App {
         this.param1.value = slide.params.theta1;
         this.param2.value = slide.params.theta2;
         this.param3.value = slide.params.length;
-        if (slide.mode === 'fk' && this.paramL1 && this.paramL2) {
+        if ((slide.mode === 'fk' || slide.mode === 'ik') && this.paramL1 && this.paramL2) {
             this.paramL1.value = slide.params.l1 != null ? slide.params.l1 : 50;
             this.paramL2.value = slide.params.l2 != null ? slide.params.l2 : 40;
         }
+        this.updateSlide(false);
+    }
+
+    syncLinkLengthNumFields() {
+        if (!this.paramL1Num || !this.paramL1 || !this.paramL2Num || !this.paramL2) return;
+        this.paramL1Num.value = String(Math.round(sliderToLinkLength(this.paramL1.value)));
+        this.paramL2Num.value = String(Math.round(sliderToLinkLength(this.paramL2.value)));
+    }
+
+    applyLinkLengthFromNum(which) {
+        const numEl = which === 1 ? this.paramL1Num : this.paramL2Num;
+        const slider = which === 1 ? this.paramL1 : this.paramL2;
+        if (!numEl || !slider) return;
+        let len = parseFloat(numEl.value);
+        if (Number.isNaN(len)) return;
+        len = Math.max(80, Math.min(350, len));
+        let s = lengthToSlider(len);
+        s = Math.max(10, Math.min(100, s));
+        slider.value = String(s);
+        const ratio = ((s - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--v', `${ratio}%`);
         this.updateSlide(false);
     }
 
@@ -366,16 +407,16 @@ class App {
         this.progressFill.style.width = `${((this.currentSlide + 1) / slides.length) * 100}%`;
         this.slideNum.innerText = `${String(this.currentSlide + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
 
-        const isFk = slide.mode === 'fk' && !isLocked;
-        if (this.groupLinkSingle) this.groupLinkSingle.style.display = isFk ? 'none' : '';
+        const showDualLinks = (slide.mode === 'fk' || slide.mode === 'ik') && !isLocked;
+        if (this.groupLinkSingle) this.groupLinkSingle.style.display = showDualLinks ? 'none' : '';
         document.querySelectorAll('.fk-only').forEach(el => {
-            el.style.display = isFk ? 'block' : 'none';
+            el.style.display = showDualLinks ? 'block' : 'none';
         });
 
         if (loadParams) {
             this.param1.value = slide.params.theta1;
             this.param2.value = slide.params.theta2;
-            if (slide.mode === 'fk') {
+            if (slide.mode === 'fk' || slide.mode === 'ik') {
                 this.param3.value = slide.params.length;
                 if (this.paramL1) this.paramL1.value = slide.params.l1 != null ? slide.params.l1 : 50;
                 if (this.paramL2) this.paramL2.value = slide.params.l2 != null ? slide.params.l2 : 40;
@@ -388,6 +429,8 @@ class App {
             const ratio = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
             slider.style.setProperty('--v', `${ratio}%`);
         });
+
+        this.syncLinkLengthNumFields();
 
         // Save State
         localStorage.setItem('mathphye_slide_rob', this.currentSlide);
@@ -464,14 +507,14 @@ class App {
         const length = sliderToLinkLength(this.param3.value);
         let l1 = length;
         let l2 = length * 0.8;
-        if (slide.mode === 'fk' && this.paramL1 && this.paramL2) {
+        if ((slide.mode === 'fk' || slide.mode === 'ik') && this.paramL1 && this.paramL2) {
             l1 = sliderToLinkLength(this.paramL1.value);
             l2 = sliderToLinkLength(this.paramL2.value);
         }
 
         if (slide.mode === "intro") this.renderIntro(length);
         if (slide.mode === "fk") this.renderFK(theta1, theta2, l1, l2);
-        if (slide.mode === "ik") this.renderIK(length);
+        if (slide.mode === "ik") this.renderIK(l1, l2);
         if (slide.mode === "multi") this.renderMulti(length);
         if (slide.mode === "workspace") this.renderWorkspace(length);
 
@@ -800,11 +843,9 @@ class App {
         this.ctx.stroke();
     }
 
-    renderIK(l) {
+    renderIK(l1, l2) {
         const originX = this.canvas.width / 2;
         const originY = this.canvas.height / 2 + 100;
-        const l1 = l;
-        const l2 = l * 0.8;
 
         const targetX = this.mouse.x;
         const targetY = this.mouse.y;
@@ -831,7 +872,7 @@ class App {
         const k2 = l2 * Math.sin(theta2);
         const theta1 = Math.atan2(dy, dx) - Math.atan2(k2, k1);
 
-        this.renderArm(theta1, theta2, l, l * 0.8);
+        this.renderArm(theta1, theta2, l1, l2);
 
         // Target marker
         this.ctx.strokeStyle = "rgba(210, 40, 40, 0.5)";

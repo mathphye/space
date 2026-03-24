@@ -88,11 +88,17 @@
                 </div>
                 <div class="control-group fk-only" id="group-link-l1" style="display: none;">
                     <label for="param-l1" id="label-param-l1">Link L₁</label>
-                    <input type="range" id="param-l1" min="10" max="100" value="50">
+                    <div class="link-l-row">
+                        <input type="range" id="param-l1" min="10" max="100" value="50">
+                        <input type="number" id="param-l1-num" class="link-length-num" min="80" max="350" step="1" inputmode="numeric" title="Longitud en px / Length (px)" aria-label="L1 length px">
+                    </div>
                 </div>
                 <div class="control-group fk-only" id="group-link-l2" style="display: none;">
                     <label for="param-l2" id="label-param-l2">Link L₂</label>
-                    <input type="range" id="param-l2" min="10" max="100" value="40">
+                    <div class="link-l-row">
+                        <input type="range" id="param-l2" min="10" max="100" value="40">
+                        <input type="number" id="param-l2-num" class="link-length-num" min="80" max="350" step="1" inputmode="numeric" title="Longitud en px / Length (px)" aria-label="L2 length px">
+                    </div>
                 </div>
             </div>
 

@@ -468,6 +468,28 @@ body.notebook-theme {
     opacity: 0.85;
 }
 
+.robotics-param-stack .link-l-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.robotics-param-stack .link-l-row input[type="range"] {
+    flex: 1;
+    min-width: 0;
+}
+
+.robotics-param-stack .link-length-num {
+    width: 4.25rem;
+    flex-shrink: 0;
+    padding: 6px 8px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    border: 1px solid rgba(26, 26, 26, 0.15);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+}
+
 .experiment-hub {
     display: flex;
     flex-direction: column;
