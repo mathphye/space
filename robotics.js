@@ -160,8 +160,8 @@ class App {
 
         this.mouse = { x: 0, y: 0 };
         this.ripples = [];
-        this.hasPaid = false;
-        
+        this.hasPaid = localStorage.getItem('mathphye_premium_unlocked') === 'true';
+
         this.init();
 
         // Restore params after updateSlide in init
@@ -251,9 +251,13 @@ class App {
         const buyBtn = document.getElementById('btn-buy');
         if (buyBtn) {
             buyBtn.onclick = () => {
+                if (typeof window.openLemonSqueezyCheckout === 'function' && window.openLemonSqueezyCheckout()) {
+                    return;
+                }
                 alert(this.lang === 'en' ? "Redirecting to Payment Gateway..." : "Redirigiendo a Pasarela de Pago...");
                 setTimeout(() => {
                     this.hasPaid = true;
+                    localStorage.setItem('mathphye_premium_unlocked', 'true');
                     this.updateSlide();
                     alert(this.lang === 'en' ? "Access Unlocked! Welcome to the Full Lab." : "¡Acceso Desbloqueado! Bienvenido al Lab Completo.");
                 }, 2000);
@@ -620,6 +624,22 @@ class App {
         const x2 = x1 + Math.cos(t1 + t2) * l2;
         const y2 = y1 - Math.sin(t1 + t2) * l2;
 
+        // Static fake target (decorative): echoes IK target but fixed, not interactive
+        const fakeTr = 16;
+        const fakeTx = originX + Math.min(260, this.canvas.width * 0.22);
+        const fakeTy = originY - Math.min(200, this.canvas.height * 0.18);
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.arc(fakeTx, fakeTy, fakeTr, 0, Math.PI * 2);
+        this.ctx.fillStyle = "rgba(210, 40, 40, 0.12)";
+        this.ctx.fill();
+        this.ctx.setLineDash([5, 5]);
+        this.ctx.strokeStyle = "rgba(210, 40, 40, 0.28)";
+        this.ctx.lineWidth = 1.5;
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+        this.ctx.restore();
+
         this.renderArm(t1, t2, l1, l2);
 
         // --- Formula Sync Context ---
@@ -689,12 +709,12 @@ class App {
         this.ctx.fillStyle = this.getInk(0.5);
         this.ctx.fillText(`= ${cartX} + i${cartY}`, formulaX + 40, formulaY + 45);
         
-        // Geometric Connection
+        // Segment end effector → static fake target (same ref as decorative circle)
         this.ctx.setLineDash([2, 4]);
-        this.ctx.strokeStyle = this.getInk(0.1);
+        this.ctx.strokeStyle = "rgba(210, 40, 40, 0.22)";
         this.ctx.beginPath();
         this.ctx.moveTo(x2, y2);
-        this.ctx.lineTo(formulaX + 400, formulaY - 10);
+        this.ctx.lineTo(fakeTx, fakeTy);
         this.ctx.stroke();
         this.ctx.restore();
     }

@@ -150,6 +150,8 @@ class App {
         this.currentSlide = parseInt(localStorage.getItem('mathphye_slide')) || 0;
         this.lang = localStorage.getItem('mathphye_lang') || 'en';
 
+        this.hasPaid = localStorage.getItem('mathphye_premium_unlocked') === 'true';
+
         this.init();
         
         // Restore params after updateSlide in init
@@ -164,7 +166,6 @@ class App {
 
         // Interactive Ripples
         this.ripples = [];
-        this.hasPaid = false; // Paywall State
     }
 
     init() {
@@ -207,11 +208,13 @@ class App {
         const buyBtn = document.getElementById('btn-buy');
         if (buyBtn) {
             buyBtn.onclick = () => {
-                // Here you would redirect to Lemon Squeezy / Stripe
-                // For now, let's simulate a successful payment:
+                if (typeof window.openLemonSqueezyCheckout === 'function' && window.openLemonSqueezyCheckout()) {
+                    return;
+                }
                 alert(this.lang === 'en' ? "Redirecting to Payment Gateway..." : "Redirigiendo a Pasarela de Pago...");
                 setTimeout(() => {
                     this.hasPaid = true;
+                    localStorage.setItem('mathphye_premium_unlocked', 'true');
                     this.updateSlide();
                     alert(this.lang === 'en' ? "Access Unlocked! Welcome to the Full Lab." : "¡Acceso Desbloqueado! Bienvenido al Lab Completo.");
                 }, 2000);
