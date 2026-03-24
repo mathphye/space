@@ -447,6 +447,27 @@ body.notebook-theme {
     z-index: 1000;
 }
 
+.robotics-param-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+    min-width: 220px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(26, 26, 26, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(8px);
+}
+
+.robotics-param-stack .control-group label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    opacity: 0.85;
+}
+
 .experiment-hub {
     display: flex;
     flex-direction: column;
@@ -739,6 +760,138 @@ body.user-idle .glass-ui:not(:hover) {
     transition-delay: 0s;
 }
 
-opacity: 0.08;
-transition-delay: 0s;
+/* --- UI TOGGLE / MINIMIZE --- */
+.card-toggle {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    width: 30px;
+    height: 30px;
+    background: none;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    opacity: 0.3;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.card-toggle:hover {
+    opacity: 1;
+    background: var(--ink);
+    color: var(--paper);
+    transform: rotate(90deg) scale(1.1);
+}
+
+#slide-container, #controls-panel {
+    transition: transform 1.2s cubic-bezier(0.15, 0.85, 0.5, 1), opacity 1.2s ease, filter 1.2s ease !important;
+}
+
+body.minimized #slide-container {
+    transform: translate(-90%, 90%) rotate(-15deg) scale(0.2);
+    opacity: 0 !important;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+body.minimized-controls #controls-panel {
+    transform: translate(90%, 90%) rotate(15deg) scale(0.2);
+    opacity: 0 !important;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+/* Restore buttons - Ink Drops */
+.restore-ui-btn {
+    position: fixed;
+    bottom: 30px;
+    padding: 15px 35px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 40% 60% 70% 30% / 40% 40% 60% 60%;
+    font-family: var(--font-heading);
+    cursor: pointer;
+    z-index: 2000;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    display: none;
+    pointer-events: auto;
+}
+
+.restore-ui-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    border-radius: 50%;
+}
+
+#restore-slides { left: 40px; }
+#restore-controls { right: 40px; }
+
+body.minimized #restore-slides { display: block; }
+body.minimized-controls #restore-controls { display: block; }
+
+.control-toggle {
+    background: none;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.6;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.control-toggle:hover {
+    opacity: 1;
+    background: var(--ink);
+    color: #fff;
+}
+
+
+/* --- EDITABLE FORMULA --- */
+.formula-box {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px dashed var(--ink-muted);
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+    transform: rotate(0.5deg);
+}
+
+.math-input {
+    background: none;
+    border: none;
+    border-bottom: 2px solid var(--ink);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: inherit;
+    width: 80px;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.math-input:focus {
+    border-bottom-color: #d22828;
+    background: rgba(210, 40, 40, 0.05);
+}
+
+.math-label {
+    font-family: var(--font-heading);
+    font-weight: bold;
+    font-size: 2.22rem;
 }

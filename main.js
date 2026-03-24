@@ -146,7 +146,17 @@ class App {
         this.fpsVal = document.getElementById('fps-val');
         this.phaseVal = document.getElementById('phase-val');
 
+        // --- Persistent State Load ---
+        this.currentSlide = parseInt(localStorage.getItem('mathphye_slide')) || 0;
+        this.lang = localStorage.getItem('mathphye_lang') || 'en';
+
         this.init();
+        
+        // Restore params after updateSlide in init
+        this.freqParam.value = localStorage.getItem('mathphye_p_freq') || this.freqParam.value;
+        this.ampParam.value = localStorage.getItem('mathphye_p_amp') || this.ampParam.value;
+        this.dampingParam.value = localStorage.getItem('mathphye_p_damping') || this.dampingParam.value;
+        this.updateSlide(false); // Reflow with restored params
 
         // Stats smoothing
         this.fpsHistory = [];
@@ -191,6 +201,7 @@ class App {
 
         this.updateSlide();
         this.setupIdleTimer();
+        this.setupUIStatsPersistence();
         
         // Paywall Action
         const buyBtn = document.getElementById('btn-buy');
@@ -210,8 +221,43 @@ class App {
         requestAnimationFrame((t) => this.loop(t));
     }
 
+    setupUIStatsPersistence() {
+        // IDs for persistence (specific to this app)
+        const KEY_S = 'mathphye_slides_min';
+        const KEY_C = 'mathphye_controls_min';
+
+        // Initial Load
+        if (localStorage.getItem(KEY_S) === 'true') document.body.classList.add('minimized');
+        if (localStorage.getItem(KEY_C) === 'true') document.body.classList.add('minimized-controls');
+
+        // Toggle Listeners
+        const btnMinS = document.querySelector('.card-toggle');
+        const btnMinC = document.querySelector('.control-toggle');
+        const btnResS = document.getElementById('restore-slides');
+        const btnResC = document.getElementById('restore-controls');
+
+        if (btnMinS) btnMinS.addEventListener('click', () => { 
+            document.body.classList.add('minimized'); 
+            localStorage.setItem(KEY_S, 'true'); 
+        });
+        if (btnResS) btnResS.addEventListener('click', () => { 
+            document.body.classList.remove('minimized'); 
+            localStorage.setItem(KEY_S, 'false'); 
+        });
+
+        if (btnMinC) btnMinC.addEventListener('click', () => { 
+            document.body.classList.add('minimized-controls'); 
+            localStorage.setItem(KEY_C, 'true'); 
+        });
+        if (btnResC) btnResC.addEventListener('click', () => { 
+            document.body.classList.remove('minimized-controls'); 
+            localStorage.setItem(KEY_C, 'false'); 
+        });
+    }
+
     setLanguage(l) {
         this.lang = l;
+        localStorage.setItem('mathphye_lang', l);
         document.getElementById('btn-en').classList.toggle('active', l === 'en');
         document.getElementById('btn-es').classList.toggle('active', l === 'es');
         this.updateSlide();
@@ -308,6 +354,12 @@ class App {
             const ratio = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
             slider.style.setProperty('--v', `${ratio}%`);
         });
+
+        // Save State
+        localStorage.setItem('mathphye_slide', this.currentSlide);
+        localStorage.setItem('mathphye_p_freq', this.freqParam.value);
+        localStorage.setItem('mathphye_p_amp', this.ampParam.value);
+        localStorage.setItem('mathphye_p_damping', this.dampingParam.value);
     }
 
     setupIdleTimer() {
