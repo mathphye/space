@@ -213,8 +213,8 @@ class App {
                 }
                 alert(this.lang === 'en' ? "Redirecting to Payment Gateway..." : "Redirigiendo a Pasarela de Pago...");
                 setTimeout(() => {
+                    // Solo en memoria: F5 vuelve a mostrar el paywall (no persistir demo)
                     this.hasPaid = true;
-                    localStorage.setItem('mathphye_premium_unlocked', 'true');
                     this.updateSlide();
                     alert(this.lang === 'en' ? "Access Unlocked! Welcome to the Full Lab." : "¡Acceso Desbloqueado! Bienvenido al Lab Completo.");
                 }, 2000);
