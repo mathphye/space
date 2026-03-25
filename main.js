@@ -3,6 +3,7 @@
 const i18n = {
     en: {
         module: "Wave Mechanics",
+        roboticsModule: "i2D Robot Arms",
         lab: "LABORATORY_",
         current: "Current Module:",
         freq: "Frequency (f)",
@@ -18,6 +19,7 @@ const i18n = {
     },
     es: {
         module: "Mecánica de Ondas",
+        roboticsModule: "Brazos Robóticos i2D",
         lab: "LABORATORIO_",
         current: "Módulo Actual:",
         freq: "Frecuencia (f)",
@@ -124,12 +126,9 @@ class App {
         this.slideText = document.getElementById('slide-text');
         this.slideNum = document.getElementById('slide-count');
         this.progressFill = document.getElementById('progress-fill');
-        this.currentModuleName = document.getElementById('module-name');
-
         // Dynamic UI for translations
         this.ui = {
             mainTitle: document.getElementById('app-main-title'),
-            topicLabel: document.querySelector('.topic-indicator'),
             labelFreq: document.querySelector('label[for="param-freq"]') || document.querySelectorAll('.control-group label')[0],
             labelAmp: document.querySelectorAll('.control-group label')[1],
             labelDamping: document.querySelectorAll('.control-group label')[2],
@@ -151,6 +150,7 @@ class App {
         this.lang = localStorage.getItem('mathphye_lang') || 'en';
 
         this.hasPaid = localStorage.getItem('mathphye_premium_unlocked') === 'true';
+        this.paywallDismissed = false;
 
         this.init();
         
@@ -186,6 +186,13 @@ class App {
             this.ripples.push({ x, y, t: 0, life: 1.0 });
         });
 
+        const modulePicker = document.getElementById('module-picker');
+        if (modulePicker) {
+            modulePicker.addEventListener('change', () => {
+                if (modulePicker.value) window.location.href = modulePicker.value;
+            });
+        }
+
         // Lang
         document.getElementById('btn-en').onclick = () => this.setLanguage('en');
         document.getElementById('btn-es').onclick = () => this.setLanguage('es');
@@ -205,6 +212,16 @@ class App {
         this.setupUIStatsPersistence();
         
         // Paywall Action
+        const paywallClose = document.getElementById('paywall-close');
+        if (paywallClose) {
+            paywallClose.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.paywallDismissed = true;
+                this.updateSlide(false);
+            };
+        }
+
         const buyBtn = document.getElementById('btn-buy');
         if (buyBtn) {
             buyBtn.onclick = () => {
@@ -289,6 +306,7 @@ class App {
 
     nextSlide() {
         if (this.currentSlide < slides.length - 1) {
+            this.paywallDismissed = false;
             this.currentSlide++;
             this.updateSlide();
         }
@@ -296,6 +314,7 @@ class App {
 
     prevSlide() {
         if (this.currentSlide > 0) {
+            this.paywallDismissed = false;
             this.currentSlide--;
             this.updateSlide();
         }
@@ -317,22 +336,35 @@ class App {
         const isLocked = slide.premium && !this.hasPaid;
 
         if (isLocked) {
-            paywall.style.display = 'flex';
-            this.slideTitle.style.opacity = '0';
-            this.slideText.style.opacity = '0';
+            this.slideTitle.innerText = slide.title[this.lang];
+            this.slideText.innerText = slide.text[this.lang];
+            if (this.paywallDismissed) {
+                paywall.style.display = 'none';
+                this.slideTitle.style.opacity = '1';
+                this.slideText.style.opacity = '1';
+            } else {
+                paywall.style.display = 'flex';
+                this.slideTitle.style.opacity = '0';
+                this.slideText.style.opacity = '0';
+            }
         } else {
+            this.paywallDismissed = false;
             paywall.style.display = 'none';
             this.slideTitle.style.opacity = '1';
             this.slideText.style.opacity = '1';
-            
-            // Trigger Text Update (Simple for now since typewriter was removed by USER)
             this.slideTitle.innerText = slide.title[this.lang];
             this.slideText.innerText = slide.text[this.lang];
         }
 
         // Update Static HUD
         this.ui.mainTitle.innerHTML = `${dict.module} <span class="ink-sub">${dict.lab}</span>`;
-        if (this.ui.topicLabel) this.ui.topicLabel.innerHTML = `${dict.current} <span id="module-name">${dict.module}</span>`;
+        const mpl = document.getElementById('module-picker-label');
+        if (mpl) mpl.textContent = dict.current;
+        const mp = document.getElementById('module-picker');
+        if (mp && mp.options.length >= 2) {
+            mp.options[0].text = dict.module;
+            mp.options[1].text = dict.roboticsModule;
+        }
         if (this.ui.labelFreq) this.ui.labelFreq.innerText = dict.freq;
         if (this.ui.labelAmp) this.ui.labelAmp.innerText = dict.amp;
         if (this.ui.labelDamping) this.ui.labelDamping.innerText = dict.damping;

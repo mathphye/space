@@ -3,6 +3,7 @@
 const i18n = {
     en: {
         module: "i2D Robot Arms",
+        waveModule: "Wave Mechanics",
         lab: "LABORATORY_",
         current: "Current Module:",
         joint1: "Joint 1 (θ₁)",
@@ -20,6 +21,7 @@ const i18n = {
     },
     es: {
         module: "Brazos Robóticos i2D",
+        waveModule: "Mecánica de Ondas",
         lab: "LABORATORIO_",
         current: "Módulo Actual:",
         joint1: "Articulación 1 (θ₁)",
@@ -124,12 +126,9 @@ class App {
         this.slideText = document.getElementById('slide-text');
         this.slideNum = document.getElementById('slide-count');
         this.progressFill = document.getElementById('progress-fill');
-        this.currentModuleName = document.getElementById('module-name');
-
         // Dynamic UI for translations
         this.ui = {
             mainTitle: document.getElementById('app-main-title'),
-            topicLabel: document.querySelector('.topic-indicator'),
             labelJoint1: document.getElementById('label-param-j1'),
             labelJoint2: document.getElementById('label-param-j2'),
             labelLength: document.getElementById('label-param-l'),
@@ -161,6 +160,7 @@ class App {
         this.mouse = { x: 0, y: 0 };
         this.ripples = [];
         this.hasPaid = localStorage.getItem('mathphye_premium_unlocked') === 'true';
+        this.paywallDismissed = false;
 
         this.init();
 
@@ -217,6 +217,13 @@ class App {
             }
         });
 
+        const modulePicker = document.getElementById('module-picker');
+        if (modulePicker) {
+            modulePicker.addEventListener('change', () => {
+                if (modulePicker.value) window.location.href = modulePicker.value;
+            });
+        }
+
         // Lang
         document.getElementById('btn-en').onclick = () => this.setLanguage('en');
         document.getElementById('btn-es').onclick = () => this.setLanguage('es');
@@ -248,6 +255,16 @@ class App {
         this.setupIdleTimer();
         this.setupUIStatsPersistence();
         
+        const paywallClose = document.getElementById('paywall-close');
+        if (paywallClose) {
+            paywallClose.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.paywallDismissed = true;
+                this.updateSlide(false);
+            };
+        }
+
         const buyBtn = document.getElementById('btn-buy');
         if (buyBtn) {
             buyBtn.onclick = () => {
@@ -358,6 +375,7 @@ class App {
 
     nextSlide() {
         if (this.currentSlide < slides.length - 1) {
+            this.paywallDismissed = false;
             this.currentSlide++;
             this.updateSlide();
         }
@@ -365,6 +383,7 @@ class App {
 
     prevSlide() {
         if (this.currentSlide > 0) {
+            this.paywallDismissed = false;
             this.currentSlide--;
             this.updateSlide();
         }
@@ -385,10 +404,19 @@ class App {
         const isLocked = slide.premium && !this.hasPaid;
 
         if (isLocked) {
-            paywall.style.display = 'flex';
-            this.slideTitle.style.opacity = '0';
-            this.slideText.style.opacity = '0';
+            this.slideTitle.innerText = slide.title[this.lang];
+            this.slideText.innerText = slide.text[this.lang];
+            if (this.paywallDismissed) {
+                paywall.style.display = 'none';
+                this.slideTitle.style.opacity = '1';
+                this.slideText.style.opacity = '1';
+            } else {
+                paywall.style.display = 'flex';
+                this.slideTitle.style.opacity = '0';
+                this.slideText.style.opacity = '0';
+            }
         } else {
+            this.paywallDismissed = false;
             paywall.style.display = 'none';
             this.slideTitle.style.opacity = '1';
             this.slideText.style.opacity = '1';
@@ -397,7 +425,13 @@ class App {
         }
 
         this.ui.mainTitle.innerHTML = `ROBOTICS <span class="ink-sub">${dict.lab}</span>`;
-        if (this.ui.topicLabel) this.ui.topicLabel.innerHTML = `${dict.current} <span id="module-name">${dict.module}</span>`;
+        const mpl = document.getElementById('module-picker-label');
+        if (mpl) mpl.textContent = dict.current;
+        const mp = document.getElementById('module-picker');
+        if (mp && mp.options.length >= 2) {
+            mp.options[0].text = dict.waveModule;
+            mp.options[1].text = dict.module;
+        }
         if (this.ui.labelJoint1) this.ui.labelJoint1.innerText = dict.joint1;
         if (this.ui.labelJoint2) this.ui.labelJoint2.innerText = dict.joint2;
         if (this.ui.labelLength) this.ui.labelLength.innerText = dict.length;
