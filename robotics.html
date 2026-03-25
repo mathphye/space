@@ -47,6 +47,7 @@
                 <select id="module-picker" class="module-picker-select" aria-label="Switch laboratory module">
                     <option value="waves.html">Wave Mechanics</option>
                     <option value="robotics.html" selected>i2D Robot Arms</option>
+                    <option value="index.html">Others</option>
                 </select>
             </div>
         </header>
@@ -67,14 +68,20 @@
             </div>
         </div>
 
-        <!-- Premium Paywall Overlay -->
-        <div id="paywall-overlay" style="display: none;">
-            <button type="button" id="paywall-close" class="paywall-close" aria-label="Cerrar / Close">×</button>
-            <div class="lock-icon">🔒</div>
-            <h2 id="paywall-title">ADVANCED MODULE LOCKED / MÓDULO AVANZADO BLOQUEADO</h2>
-            <p id="paywall-text">You've reached the limits of the free observation. Unlock the Full Digital Laboratory to access advanced inverse kinematics, path planning, and trajectory optimization.</p>
-            <button id="btn-buy" class="main-action pulse">GET FULL ACCESS / ACCESO COMPLETO — $2.99</button>
-            <p class="paywall-footer">Handmade by Mathphye Lab © 2026</p>
+        <!-- Premium hint (compact, non-blocking) -->
+        <div id="paywall-overlay" class="paywall-compact" style="display: none;" role="dialog" aria-labelledby="paywall-title" aria-describedby="paywall-text">
+            <div class="paywall-compact__row">
+                <span class="paywall-compact__icon" aria-hidden="true">🔒</span>
+                <div class="paywall-compact__copy">
+                    <p id="paywall-title" class="paywall-compact__title">Premium slide</p>
+                    <p id="paywall-text" class="paywall-compact__desc">*Donation* To build advanced robotics topics in the full lab. Optional unlock — $2.99.</p>
+                </div>
+                <div class="paywall-compact__actions">
+                    <button type="button" id="btn-buy" class="paywall-unlock-btn">Unlock</button>
+                    <button type="button" id="paywall-close" class="paywall-dismiss" aria-label="Close">×</button>
+                </div>
+            </div>
+            <p class="paywall-compact__foot">Mathphye Lab</p>
         </div>
 
         <!-- Live Controls -->
@@ -110,7 +117,7 @@
 
             <div class="panel-footer experiment-hub">
                 <button class="control-toggle" title="Minimize">×</button>
-                <button id="btn-random" class="action-btn main-action pulse">RANDOM POSE / GENERAR</button>
+                <button id="btn-random" class="action-btn main-action pulse">RANDOMiZE</button>
                 <button id="btn-reset" class="action-btn">Reset</button>
             </div>
         </div>

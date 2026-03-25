@@ -433,84 +433,152 @@ a.hub-back-link:hover {
     transition: var(--transition);
 }
 
-/* Premium Paywall Style */
-#paywall-overlay {
-    position: absolute;
-    bottom: 80px;
-    left: 80px;
-    width: 650px;
-    padding: 100px 80px;
-    background: #1a1a1a;
-    color: #ffffff;
-    border-radius: 4px;
-    z-index: 2000;
-    text-align: center;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.5);
-    display: none; /* Controlled by JS */
+/* Premium hint — small floating card, does not cover the slide */
+#paywall-overlay.paywall-compact {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    left: auto;
+    width: auto;
+    max-width: min(380px, calc(100vw - 32px));
+    padding: 12px 14px 10px;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.94);
+    color: var(--ink);
+    border-radius: 14px;
+    border: 1px solid rgba(26, 26, 26, 0.1);
+    z-index: 2500;
+    text-align: left;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    backdrop-filter: blur(12px);
+    display: none;
     flex-direction: column;
-    align-items: center;
-    gap: 30px;
+    align-items: stretch;
+    gap: 8px;
+    pointer-events: auto;
 }
 
-.paywall-close {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    width: 42px;
-    height: 42px;
+.paywall-compact__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.paywall-compact__icon {
+    font-size: 1.15rem;
+    line-height: 1.4;
+    opacity: 0.85;
+    flex-shrink: 0;
+}
+
+.paywall-compact__copy {
+    flex: 1;
+    min-width: 0;
+}
+
+#paywall-title.paywall-compact__title,
+.paywall-compact__title {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--ink);
+    margin: 0 0 4px 0;
+}
+
+#paywall-text.paywall-compact__desc,
+.paywall-compact__desc {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--ink-muted);
+    margin: 0;
+}
+
+.paywall-compact__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.paywall-unlock-btn {
+    appearance: none;
+    -webkit-appearance: none;
     border: none;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    font-size: 1.6rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    white-space: nowrap;
+}
+
+.paywall-unlock-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.paywall-dismiss {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(26, 26, 26, 0.06);
+    color: var(--ink);
+    font-size: 1.1rem;
     line-height: 1;
     cursor: pointer;
-    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
     font-family: var(--font-mono);
+    opacity: 0.55;
+    transition: opacity 0.15s ease, background 0.15s ease;
 }
 
-.paywall-close:hover {
-    background: rgba(255, 255, 255, 0.22);
+.paywall-dismiss:hover {
+    opacity: 1;
+    background: rgba(26, 26, 26, 0.1);
 }
 
-#paywall-overlay .lock-icon {
-    font-size: 5rem;
-    margin-bottom: 20px;
-    filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
-}
-
-#paywall-title {
-    font-family: var(--font-heading);
-    font-size: 2.5rem;
-    line-height: 1.2;
-    color: #fff;
+.paywall-compact__foot {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.35;
     margin: 0;
+    padding-top: 2px;
+    border-top: 1px solid rgba(26, 26, 26, 0.06);
 }
 
-#paywall-text {
-    font-family: var(--font-body);
-    font-size: 1.2rem;
-    line-height: 1.6;
-    color: rgba(255,255,255,0.7);
-    max-width: 80%;
-}
+@media (max-width: 520px) {
+    #paywall-overlay.paywall-compact {
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
+        max-width: none;
+    }
 
-#btn-buy {
-    background: #fff;
-    color: #000;
-    width: 100%;
-    max-width: 400px;
-    border-radius: 50px;
-}
+    .paywall-compact__row {
+        flex-wrap: wrap;
+    }
 
-.paywall-footer {
-    font-size: 0.8rem;
-    opacity: 0.4;
-    letter-spacing: 2px;
+    .paywall-compact__actions {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+    }
 }
 
 #slide-number {

@@ -4,6 +4,7 @@ const i18n = {
     en: {
         module: "i2D Robot Arms",
         waveModule: "Wave Mechanics",
+        hubOther: "Others",
         lab: "LABORATORY_",
         current: "Current Module:",
         joint1: "Joint 1 (θ₁)",
@@ -22,6 +23,7 @@ const i18n = {
     es: {
         module: "Brazos Robóticos i2D",
         waveModule: "Mecánica de Ondas",
+        hubOther: "Otros",
         lab: "LABORATORIO_",
         current: "Módulo Actual:",
         joint1: "Articulación 1 (θ₁)",
@@ -406,18 +408,15 @@ class App {
         if (isLocked) {
             this.slideTitle.innerText = slide.title[this.lang];
             this.slideText.innerText = slide.text[this.lang];
-            if (this.paywallDismissed) {
-                paywall.style.display = 'none';
-                this.slideTitle.style.opacity = '1';
-                this.slideText.style.opacity = '1';
-            } else {
-                paywall.style.display = 'flex';
-                this.slideTitle.style.opacity = '0';
-                this.slideText.style.opacity = '0';
+            this.slideTitle.style.opacity = '1';
+            this.slideText.style.opacity = '1';
+            if (paywall) {
+                if (this.paywallDismissed) paywall.style.display = 'none';
+                else paywall.style.display = 'flex';
             }
         } else {
             this.paywallDismissed = false;
-            paywall.style.display = 'none';
+            if (paywall) paywall.style.display = 'none';
             this.slideTitle.style.opacity = '1';
             this.slideText.style.opacity = '1';
             this.slideTitle.innerText = slide.title[this.lang];
@@ -428,9 +427,10 @@ class App {
         const mpl = document.getElementById('module-picker-label');
         if (mpl) mpl.textContent = dict.current;
         const mp = document.getElementById('module-picker');
-        if (mp && mp.options.length >= 2) {
+        if (mp && mp.options.length >= 3) {
             mp.options[0].text = dict.waveModule;
             mp.options[1].text = dict.module;
+            mp.options[2].text = dict.hubOther;
         }
         if (this.ui.labelJoint1) this.ui.labelJoint1.innerText = dict.joint1;
         if (this.ui.labelJoint2) this.ui.labelJoint2.innerText = dict.joint2;

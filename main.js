@@ -4,6 +4,7 @@ const i18n = {
     en: {
         module: "Wave Mechanics",
         roboticsModule: "i2D Robot Arms",
+        hubOther: "Others",
         lab: "LABORATORY_",
         current: "Current Module:",
         freq: "Frequency (f)",
@@ -20,6 +21,7 @@ const i18n = {
     es: {
         module: "Mecánica de Ondas",
         roboticsModule: "Brazos Robóticos i2D",
+        hubOther: "Otros",
         lab: "LABORATORIO_",
         current: "Módulo Actual:",
         freq: "Frecuencia (f)",
@@ -338,18 +340,15 @@ class App {
         if (isLocked) {
             this.slideTitle.innerText = slide.title[this.lang];
             this.slideText.innerText = slide.text[this.lang];
-            if (this.paywallDismissed) {
-                paywall.style.display = 'none';
-                this.slideTitle.style.opacity = '1';
-                this.slideText.style.opacity = '1';
-            } else {
-                paywall.style.display = 'flex';
-                this.slideTitle.style.opacity = '0';
-                this.slideText.style.opacity = '0';
+            this.slideTitle.style.opacity = '1';
+            this.slideText.style.opacity = '1';
+            if (paywall) {
+                if (this.paywallDismissed) paywall.style.display = 'none';
+                else paywall.style.display = 'flex';
             }
         } else {
             this.paywallDismissed = false;
-            paywall.style.display = 'none';
+            if (paywall) paywall.style.display = 'none';
             this.slideTitle.style.opacity = '1';
             this.slideText.style.opacity = '1';
             this.slideTitle.innerText = slide.title[this.lang];
@@ -361,9 +360,10 @@ class App {
         const mpl = document.getElementById('module-picker-label');
         if (mpl) mpl.textContent = dict.current;
         const mp = document.getElementById('module-picker');
-        if (mp && mp.options.length >= 2) {
+        if (mp && mp.options.length >= 3) {
             mp.options[0].text = dict.module;
             mp.options[1].text = dict.roboticsModule;
+            mp.options[2].text = dict.hubOther;
         }
         if (this.ui.labelFreq) this.ui.labelFreq.innerText = dict.freq;
         if (this.ui.labelAmp) this.ui.labelAmp.innerText = dict.amp;
