@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robotics Lab | i2D Robot Arms</title>
+    <title>Wave Mechanics Lab | Mathphye</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,14 +39,14 @@
 
 
             <div class="main-title-container">
-                <h1 id="app-main-title">ROBOTICS <span class="ink-sub">LABORATORY</span></h1>
+                <h1 id="app-main-title">WAVE MECHANICS <span class="ink-sub">LABORATORY</span></h1>
             </div>
 
             <div class="topic-indicator topic-indicator--picker">
                 <label for="module-picker" class="topic-indicator-label" id="module-picker-label">Current Module:</label>
                 <select id="module-picker" class="module-picker-select" aria-label="Switch laboratory module">
-                    <option value="waves.html">Wave Mechanics</option>
-                    <option value="robotics.html" selected>i2D Robot Arms</option>
+                    <option value="waves.html" selected>Wave Mechanics</option>
+                    <option value="robotics.html">i2D Robot Arms</option>
                 </select>
             </div>
         </header>
@@ -54,14 +54,15 @@
         <!-- Slide Content -->
         <div id="slide-container" class="glass-ui">
             <button class="card-toggle" title="Minimize">×</button>
-            <h2 id="slide-title">Kinematics</h2>
-            <p id="slide-text">Exploring the geometry of movement. How joint angles translate to end-effector positions in 2D space.</p>
+            <h2 id="slide-title">Traveling Waves</h2>
+            <p id="slide-text">An oscillation that travels through a medium, transporting energy without transporting
+                matter.</p>
 
             <div class="slide-navigation">
                 <button id="btn-prev" class="nav-btn">← Prev</button>
                 <div class="progress-container">
                     <div id="progress-fill"></div>
-                    <span id="slide-count" class="count-overlay">01 / 05</span>
+                    <span id="slide-count" class="count-overlay">01 / 06</span>
                 </div>
                 <button id="btn-next" class="nav-btn">Next →</button>
             </div>
@@ -72,45 +73,31 @@
             <button type="button" id="paywall-close" class="paywall-close" aria-label="Cerrar / Close">×</button>
             <div class="lock-icon">🔒</div>
             <h2 id="paywall-title">ADVANCED MODULE LOCKED / MÓDULO AVANZADO BLOQUEADO</h2>
-            <p id="paywall-text">You've reached the limits of the free observation. Unlock the Full Digital Laboratory to access advanced inverse kinematics, path planning, and trajectory optimization.</p>
+            <p id="paywall-text">You've reached the limits of the free observation. Unlock the Full Digital Laboratory to access all advanced chapters, spectral analysis, and export tools.</p>
             <button id="btn-buy" class="main-action pulse">GET FULL ACCESS / ACCESO COMPLETO — $2.99</button>
             <p class="paywall-footer">Handmade by Mathphye Lab © 2026</p>
         </div>
 
         <!-- Live Controls -->
         <div id="controls-panel">
-            <div id="robotics-params" class="robotics-param-stack">
+            <div id="hidden-params" style="display: none;">
                 <div class="control-group">
-                    <label for="param-freq" id="label-param-j1">Joint 1 (θ₁)</label>
-                    <input type="range" id="param-freq" min="0" max="100" value="50">
+                    <label>Frequency (f)</label>
+                    <input type="range" id="param-freq" min="1" max="100" value="50">
                 </div>
                 <div class="control-group">
-                    <label for="param-amp" id="label-param-j2">Joint 2 (θ₂)</label>
-                    <input type="range" id="param-amp" min="0" max="100" value="70">
+                    <label>Amplitude (A)</label>
+                    <input type="range" id="param-amp" min="1" max="100" value="70">
                 </div>
-                <div class="control-group" id="group-link-single">
-                    <label for="param-damping" id="label-param-l">Link Length (L)</label>
-                    <input type="range" id="param-damping" min="10" max="100" value="50">
-                </div>
-                <div class="control-group fk-only" id="group-link-l1" style="display: none;">
-                    <label for="param-l1" id="label-param-l1">Link L₁</label>
-                    <div class="link-l-row">
-                        <input type="range" id="param-l1" min="10" max="100" value="50">
-                        <input type="number" id="param-l1-num" class="link-length-num" min="80" max="350" step="1" inputmode="numeric" title="Longitud en px / Length (px)" aria-label="L1 length px">
-                    </div>
-                </div>
-                <div class="control-group fk-only" id="group-link-l2" style="display: none;">
-                    <label for="param-l2" id="label-param-l2">Link L₂</label>
-                    <div class="link-l-row">
-                        <input type="range" id="param-l2" min="10" max="100" value="40">
-                        <input type="number" id="param-l2-num" class="link-length-num" min="80" max="350" step="1" inputmode="numeric" title="Longitud en px / Length (px)" aria-label="L2 length px">
-                    </div>
+                <div class="control-group">
+                    <label>Damping (γ)</label>
+                    <input type="range" id="param-damping" min="0" max="100" value="0">
                 </div>
             </div>
 
             <div class="panel-footer experiment-hub">
                 <button class="control-toggle" title="Minimize">×</button>
-                <button id="btn-random" class="action-btn main-action pulse">RANDOM POSE / GENERAR</button>
+                <button id="btn-random" class="action-btn main-action pulse">EXPLORE RANDOM / GENERAR</button>
                 <button id="btn-reset" class="action-btn">Reset</button>
             </div>
         </div>
@@ -127,8 +114,8 @@
                 </div>
             </div>
             <div class="stat-box">
-                <span class="val" id="phase-val">0.00°</span>
-                <span class="lab">ANGLE</span>
+                <span class="val" id="phase-val">0.00π</span>
+                <span class="lab">PHASE</span>
             </div>
         </aside>
 
@@ -187,7 +174,7 @@
     <button id="restore-controls" class="restore-ui-btn">⚙️ Restore Controls</button>
 
     <script src="checkout-config.js"></script>
-    <script src="robotics.js"></script>
+    <script src="main.js"></script>
 </body>
 
 </html>

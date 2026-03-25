@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Story Hub | Interactive Classroom</title>
+    <title>Mathphye Lab | Interactive classrooms</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,168 +13,42 @@
         rel="stylesheet">
 </head>
 
-<body class="fullscreen-app notebook-theme">
-    <!-- SVG Notebook Background -->
+<body class="notebook-theme hub-page">
     <div class="notebook-background">
         <svg width="100%" height="100%">
             <defs>
-                <pattern id="dot-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <pattern id="dot-grid-hub" width="40" height="40" patternUnits="userSpaceOnUse">
                     <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e0e0e0" stroke-width="1" />
                 </pattern>
             </defs>
             <rect width="100%" height="100%" fill="#fafafa" />
-            <rect width="100%" height="100%" fill="url(#dot-grid)" />
+            <rect width="100%" height="100%" fill="url(#dot-grid-hub)" />
             <line x1="120" y1="0" x2="120" y2="100%" stroke="rgba(209, 77, 77, 0.1)" stroke-width="2" />
         </svg>
     </div>
-    <!-- Fullscreen Interactive Layer -->
-    <canvas id="main-canvas"></canvas>
 
-    <!-- UI Overlay (HUD) -->
-    <div id="hud-layer">
-        <header class="hud-header">
-            <div class="brand-group">
-                <div class="brand">Mathphye</div>
-            </div>
-
-
-            <div class="main-title-container">
-                <h1 id="app-main-title">WAVE MECHANICS <span class="ink-sub">LABORATORY</span></h1>
-            </div>
-
-            <div class="topic-indicator topic-indicator--picker">
-                <label for="module-picker" class="topic-indicator-label" id="module-picker-label">Current Module:</label>
-                <select id="module-picker" class="module-picker-select" aria-label="Switch laboratory module">
-                    <option value="index.html" selected>Wave Mechanics</option>
-                    <option value="robotics.html">i2D Robot Arms</option>
-                </select>
-            </div>
+    <main class="hub-content">
+        <header class="hub-header">
+            <p class="hub-eyebrow">Interactive notebooks</p>
+            <h1 class="hub-title">Mathphye</h1>
+            <p class="hub-subtitle">Elegí un laboratorio / Choose a lab</p>
         </header>
 
-        <!-- Slide Content -->
-        <div id="slide-container" class="glass-ui">
-            <button class="card-toggle" title="Minimize">×</button>
-            <h2 id="slide-title">Traveling Waves</h2>
-            <p id="slide-text">An oscillation that travels through a medium, transporting energy without transporting
-                matter.</p>
-
-            <div class="slide-navigation">
-                <button id="btn-prev" class="nav-btn">← Prev</button>
-                <div class="progress-container">
-                    <div id="progress-fill"></div>
-                    <span id="slide-count" class="count-overlay">01 / 06</span>
-                </div>
-                <button id="btn-next" class="nav-btn">Next →</button>
-            </div>
-        </div>
-
-        <!-- Premium Paywall Overlay -->
-        <div id="paywall-overlay" style="display: none;">
-            <button type="button" id="paywall-close" class="paywall-close" aria-label="Cerrar / Close">×</button>
-            <div class="lock-icon">🔒</div>
-            <h2 id="paywall-title">ADVANCED MODULE LOCKED / MÓDULO AVANZADO BLOQUEADO</h2>
-            <p id="paywall-text">You've reached the limits of the free observation. Unlock the Full Digital Laboratory to access all advanced chapters, spectral analysis, and export tools.</p>
-            <button id="btn-buy" class="main-action pulse">GET FULL ACCESS / ACCESO COMPLETO — $2.99</button>
-            <p class="paywall-footer">Handmade by Mathphye Lab © 2026</p>
-        </div>
-
-        <!-- Live Controls -->
-        <div id="controls-panel">
-            <div id="hidden-params" style="display: none;">
-                <div class="control-group">
-                    <label>Frequency (f)</label>
-                    <input type="range" id="param-freq" min="1" max="100" value="50">
-                </div>
-                <div class="control-group">
-                    <label>Amplitude (A)</label>
-                    <input type="range" id="param-amp" min="1" max="100" value="70">
-                </div>
-                <div class="control-group">
-                    <label>Damping (γ)</label>
-                    <input type="range" id="param-damping" min="0" max="100" value="0">
-                </div>
-            </div>
-
-            <div class="panel-footer experiment-hub">
-                <button class="control-toggle" title="Minimize">×</button>
-                <button id="btn-random" class="action-btn main-action pulse">EXPLORE RANDOM / GENERAR</button>
-                <button id="btn-reset" class="action-btn">Reset</button>
-            </div>
-        </div>
-
-        <aside class="side-info">
-            <div class="stats-row">
-                <div class="lang-toggle">
-                    <button id="btn-en" class="active">EN</button> /
-                    <button id="btn-es">ES</button>
-                </div>
-                <div class="stat-box">
-                    <span class="val" id="fps-val">60</span>
-                    <span class="lab">FPS</span>
-                </div>
-            </div>
-            <div class="stat-box">
-                <span class="val" id="phase-val">0.00π</span>
-                <span class="lab">PHASE</span>
-            </div>
-        </aside>
-
-        <!-- Dynamic Decorations -->
-        <div class="decorations">
-            <div class="ink-spill top-left splash">
-                <svg viewBox="0 0 200 200">
-                    <path d="M40,50 Q10,80 40,120 T90,160 T140,120 T110,60 T40,50 Z" fill="rgba(0, 0, 0, 0.18)" />
-                    <circle cx="60" cy="80" r="8" fill="rgba(255,255,255,0.05)" />
-                    <circle cx="100" cy="110" r="12" fill="rgba(255,255,255,0.03)" />
-                    <circle cx="150" cy="50" r="4" fill="rgba(0,0,0,0.15)" />
-                    <circle cx="180" cy="90" r="6" fill="rgba(0,0,0,0.12)" />
-                    <circle cx="160" cy="150" r="3" fill="rgba(0,0,0,0.1)" />
-                    <circle cx="30" cy="160" r="5" fill="rgba(0,0,0,0.14)" />
-                </svg>
-            </div>
-            <div class="ink-spill bottom-right splash-bubbles">
-                <svg viewBox="0 0 200 200">
-                    <path d="M50,50 Q80,20 120,40 T160,80 T150,140 T80,160 T40,110 Z" fill="rgba(0, 0, 0, 0.12)" />
-                    <circle cx="150" cy="150" r="15" fill="rgba(0,0,0,0.1)" />
-                    <circle cx="130" cy="170" r="8" fill="rgba(0,0,0,0.08)" />
-                    <circle cx="170" cy="130" r="5" fill="rgba(0,0,0,0.12)" />
-                    <circle cx="120" cy="60" r="6" fill="rgba(255,255,255,0.04)" />
-                </svg>
-            </div>
-            <div class="ink-splat splat-1 bubble-style">
-                <svg viewBox="0 0 100 100">
-                    <path d="M50,10 C60,15 75,10 85,25 C95,45 80,65 65,85 C45,95 25,85 10,65 C5,45 20,15 50,10 Z"
-                        fill="rgba(0,0,0,0.1)" />
-                    <circle cx="40" cy="30" r="5" fill="rgba(255,255,255,0.08)" />
-                </svg>
-            </div>
-            <div class="ink-splat splat-3">
-                <svg viewBox="0 0 200 200">
-                    <path
-                        d="M100,100 L120,40 L110,100 L160,80 L110,110 L140,160 L100,120 L60,160 L90,110 L40,80 L90,100 Z"
-                        fill="rgba(0,0,0,0.08)" />
-                    <circle cx="130" cy="130" r="3" fill="rgba(0,0,0,0.1)" />
-                    <circle cx="70" cy="70" r="4" fill="rgba(0,0,0,0.1)" />
-                </svg>
-            </div>
-            <div class="ink-splat splat-2">
-                <svg viewBox="0 0 100 100">
-                    <path d="M30,20 C50,10 80,20 90,40 C100,60 70,90 40,85 C20,80 10,50 30,20 Z"
-                        fill="rgba(26,26,26,0.02)" />
-                </svg>
-            </div>
-            <div class="utensil pen">🖋️</div>
-            <div class="utensil clip">📎</div>
-            <div class="utensil ruler">📐</div>
-            <div class="utensil coffee">☕</div>
-        </div>
-    </div>
-
-    <button id="restore-slides" class="restore-ui-btn">📖 Restore Notes</button>
-    <button id="restore-controls" class="restore-ui-btn">⚙️ Restore Controls</button>
-
-    <script src="checkout-config.js"></script>
-    <script src="main.js"></script>
+        <nav class="hub-labs" aria-label="Laboratories">
+            <a href="waves.html" class="hub-lab-card">
+                <span class="hub-lab-icon" aria-hidden="true">🌊</span>
+                <h2 class="hub-lab-name">Wave Mechanics</h2>
+                <p class="hub-lab-desc">Ondas, interferencia y visualización en el plano.</p>
+                <span class="hub-lab-cta">Abrir laboratorio →</span>
+            </a>
+            <a href="robotics.html" class="hub-lab-card">
+                <span class="hub-lab-icon" aria-hidden="true">🛰️</span>
+                <h2 class="hub-lab-name">Robotics (i2D)</h2>
+                <p class="hub-lab-desc">Brazo planar: cinemática directa e inversa.</p>
+                <span class="hub-lab-cta">Abrir laboratorio →</span>
+            </a>
+        </nav>
+    </main>
 </body>
 
 </html>

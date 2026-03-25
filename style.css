@@ -25,6 +25,130 @@ body.notebook-theme {
     font-family: var(--font-body);
 }
 
+/* Landing: index → waves / robotics */
+body.hub-page {
+    min-height: 100vh;
+    height: auto;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+}
+
+.hub-content {
+    position: relative;
+    z-index: 1;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 72px 28px 100px;
+}
+
+.hub-header {
+    text-align: center;
+    margin-bottom: 56px;
+}
+
+.hub-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.45;
+    margin-bottom: 12px;
+}
+
+.hub-title {
+    font-family: var(--font-heading);
+    font-size: clamp(3.2rem, 10vw, 5.5rem);
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: var(--ink);
+    transform: rotate(-1deg);
+    text-shadow: 1px 1px 1.5px rgba(0, 0, 0, 0.08);
+}
+
+.hub-subtitle {
+    font-family: var(--font-body);
+    font-size: 1.35rem;
+    margin-top: 18px;
+    opacity: 0.72;
+}
+
+.hub-labs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 28px;
+}
+
+.hub-lab-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 32px 28px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px dashed rgba(26, 26, 26, 0.18);
+    border-radius: 8px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+    text-decoration: none;
+    color: var(--ink);
+    transition: var(--transition);
+}
+
+.hub-lab-card:hover {
+    transform: translateY(-4px) rotate(-0.5deg);
+    border-color: rgba(26, 26, 26, 0.35);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+}
+
+.hub-lab-icon {
+    font-size: 2.2rem;
+    line-height: 1;
+}
+
+.hub-lab-name {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.hub-lab-desc {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    line-height: 1.5;
+    opacity: 0.78;
+    margin: 0;
+    flex: 1;
+}
+
+.hub-lab-cta {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    opacity: 0.55;
+    margin-top: 8px;
+}
+
+a.hub-back-link {
+    font-size: 5rem;
+    font-weight: 900;
+    position: relative;
+    letter-spacing: -3px;
+    line-height: 1;
+    color: var(--ink);
+    text-decoration: none;
+    font-family: var(--font-heading);
+    transition: opacity 0.2s ease;
+}
+
+a.hub-back-link:hover {
+    opacity: 0.72;
+}
+
 .notebook-background {
     position: fixed;
     top: 0;

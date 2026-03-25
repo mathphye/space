@@ -6,6 +6,7 @@
  * 3. Pégalo en LEMONSQUEEZY_CHECKOUT_URL (cadena no vacía).
  * 4. En el producto: Settings → Confirmation → "Redirect URL" tras compra exitosa, por ejemplo:
  *      https://TU-USUARIO.github.io/repo/index.html?purchase=success
+ *      https://TU-USUARIO.github.io/repo/waves.html?purchase=success
  *      https://TU-USUARIO.github.io/repo/robotics.html?purchase=success
  *    purchase=success guarda el desbloqueo en localStorage (persiste tras F5). El demo del botón
  *    sin compra real no escribe localStorage: al recargar vuelve el paywall.
