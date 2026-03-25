@@ -196,7 +196,7 @@ class App {
                 const ratio = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
                 slider.style.setProperty('--v', `${ratio}%`);
             };
-            slider.oninput = () => { updateVal(); this.updateSlide(); };
+            slider.oninput = () => { updateVal(); this.updateSlide(false); };
             updateVal(); // Initial call
         });
 
@@ -215,7 +215,7 @@ class App {
                 setTimeout(() => {
                     // Solo en memoria: F5 vuelve a mostrar el paywall (no persistir demo)
                     this.hasPaid = true;
-                    this.updateSlide();
+                    this.updateSlide(false);
                     alert(this.lang === 'en' ? "Access Unlocked! Welcome to the Full Lab." : "¡Acceso Desbloqueado! Bienvenido al Lab Completo.");
                 }, 2000);
             };
@@ -305,11 +305,10 @@ class App {
         const slide = slides[this.currentSlide];
         const dict = i18n[this.lang];
 
-        // Trigger Page Turn Animation
         const container = document.getElementById('slide-container');
-        if (container) {
+        if (container && loadParams) {
             container.classList.remove('page-turn');
-            void container.offsetWidth; // Force reflow
+            void container.offsetWidth;
             container.classList.add('page-turn');
         }
 

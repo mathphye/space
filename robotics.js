@@ -258,7 +258,7 @@ class App {
                 setTimeout(() => {
                     // Solo en memoria: F5 vuelve a mostrar el paywall (no persistir demo)
                     this.hasPaid = true;
-                    this.updateSlide();
+                    this.updateSlide(false);
                     alert(this.lang === 'en' ? "Access Unlocked! Welcome to the Full Lab." : "¡Acceso Desbloqueado! Bienvenido al Lab Completo.");
                 }, 2000);
             };
@@ -375,7 +375,7 @@ class App {
         const dict = i18n[this.lang];
 
         const container = document.getElementById('slide-container');
-        if (container) {
+        if (container && loadParams) {
             container.classList.remove('page-turn');
             void container.offsetWidth;
             container.classList.add('page-turn');
